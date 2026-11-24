@@ -4,7 +4,7 @@ Last updated: 2026-11-24
 
 ## Current status
 
-The prototype now includes a bilingual sample-story reader with local reading-position persistence. Its production build succeeds. GitHub `origin` is configured and local `main` tracks `origin/main`; deployment hosting is still undecided.
+The prototype includes a bilingual sample-story reader with local reading-position persistence. Commit `fe47bd0` is pushed to GitHub `origin/main`; the production build succeeds. Deployment hosting is still undecided.
 
 ## Decisions
 
@@ -29,7 +29,8 @@ The prototype now includes a bilingual sample-story reader with local reading-po
 - Connected the local `main` branch to the GitHub repository and confirmed it is synchronized.
 - Added a bilingual reader for the bundled sample stories with page navigation, text-size controls, completion state, and saved reading position.
 - Added IndexedDB reading-progress records and a Progress page with last-opened details and a continue-reading action.
-- Ran `npm run build` successfully.
+- Ran `npm.cmd run build` successfully during the push workflow. No type-check script is configured.
+- Pushed commit `fe47bd0` (`Add bilingual reader and local progress`) to `origin/main`.
 
 ## Next steps
 
@@ -41,6 +42,7 @@ The prototype now includes a bilingual sample-story reader with local reading-po
 ## Open decisions and manual follow-up
 
 - Android packaging/distribution is intentionally undecided for the first working prototype.
+- Choose a PWA deployment host before running the deployment step in `$push`.
 - When ready to publish, choose a hosting provider for the PWA and a distribution route for Android. Set required secrets through the provider or local secure storage; never place them in source control.
 - Provide story files and confirm their distribution rights before replacing fictional placeholders. Burmese copy should receive a fluent-language review before release.
 - Choose a Burmese-capable font strategy that works offline and confirm the font license before bundling a font file.
