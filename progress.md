@@ -37,6 +37,9 @@ The prototype includes a bilingual sample-story reader, a guided story-writing f
 - Added bilingual recommended-category cards on Home that open the built-in Library with the chosen category selected.
 - Ran `npm.cmd run build` successfully during the push workflow. No type-check script is configured.
 - Pushed commit `fe47bd0` (`Add bilingual reader and local progress`) to `origin/main`.
+- Ran `npm.cmd run build` successfully for the guided story-writing and home-category update; no type-check script is configured.
+- Pushed commit `3fedcf6` (`Add guided story writing and home recommendations`) to `origin/main`.
+- Deferred Vercel production deployment as requested until the agreed MVP features are complete.
 - Selected Vercel as the production host for the public PWA because Cloudflare requires a VPN for the user.
 
 ## Next steps
