@@ -1,0 +1,7 @@
+interface:
+  display_name: "/continue"
+  short_description: "Continue the next agreed project step"
+  default_prompt: "Use $continue to read progress.md and implement the next agreed project step."
+policy:
+  allow_implicit_invocation: true
+

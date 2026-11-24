@@ -1,0 +1,7 @@
+interface:
+  display_name: "/push"
+  short_description: "Check, fix, push, and deploy the app"
+  default_prompt: "Use $push to check build and type errors, fix relevant issues, push to GitHub, and deploy."
+policy:
+  allow_implicit_invocation: true
+

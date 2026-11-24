@@ -1,0 +1,7 @@
+interface:
+  display_name: "/pull"
+  short_description: "Sync the configured GitHub branch safely"
+  default_prompt: "Use $pull to fetch and integrate the latest configured GitHub branch."
+policy:
+  allow_implicit_invocation: true
+

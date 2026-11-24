@@ -1,0 +1,20 @@
+{
+  "name": "Offline Digital Story Library",
+  "short_name": "Story Library",
+  "description": "A free offline story library for young readers.",
+  "lang": "en",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f6f5ee",
+  "theme_color": "#f6f5ee",
+  "icons": [
+    {
+      "src": "/storybook.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
+

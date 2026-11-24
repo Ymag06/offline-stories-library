@@ -1,0 +1,7 @@
+interface:
+  display_name: "/askmefirst"
+  short_description: "Clarify important choices before implementation"
+  default_prompt: "Use $askmefirst to ask me the key questions before implementing this change."
+policy:
+  allow_implicit_invocation: true
+
