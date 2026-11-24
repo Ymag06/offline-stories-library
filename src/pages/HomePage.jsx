@@ -1,8 +1,12 @@
+import { useEffect, useState } from 'react'
 import StoryCard from '../components/StoryCard.jsx'
 import CategoryRecommendationCard from '../components/CategoryRecommendationCard.jsx'
+import ReadingProgressCard from '../components/ReadingProgressCard.jsx'
 import { categories, stories } from '../data/stories.js'
+import { getAllReadingProgress } from '../lib/readingProgress.js'
 
 export default function HomePage({ text, language, onNavigate, onChooseStory, onChooseCategory }) {
+  const [recentStories, setRecentStories] = useState([])
   const featuredStories = stories.filter((story) => story.featured)
   const recommendedCategories = categories
     .filter((category) => category.id !== 'all')
@@ -10,6 +14,29 @@ export default function HomePage({ text, language, onNavigate, onChooseStory, on
       ...category,
       storyCount: stories.filter((story) => story.category === category.id).length,
     }))
+
+  useEffect(() => {
+    let active = true
+    const builtInStories = new Map(stories.map((story) => [story.id, story]))
+
+    getAllReadingProgress()
+      .then((records) => {
+        if (!active) return
+        const recent = records
+          .filter((record) => {
+            const story = builtInStories.get(record.storyId)
+            const reachedLastPage = record.totalPages > 0 && record.lastPosition >= record.totalPages - 1
+            return story && !record.completed && !reachedLastPage
+          })
+          .sort((first, second) => new Date(second.lastOpenedAt) - new Date(first.lastOpenedAt))
+          .slice(0, 3)
+          .map((record) => ({ record, story: builtInStories.get(record.storyId) }))
+        setRecentStories(recent)
+      })
+      .catch(() => { if (active) setRecentStories([]) })
+
+    return () => { active = false }
+  }, [])
 
   return (
     <>
@@ -54,6 +81,30 @@ export default function HomePage({ text, language, onNavigate, onChooseStory, on
           ))}
         </div>
       </section>
+
+      {recentStories.length > 0 && (
+        <section className="home-recent-section" aria-labelledby="recent-stories-title">
+          <div className="section-heading">
+            <div>
+              <span className="eyebrow">{text.progress}</span>
+              <h2 id="recent-stories-title">{text.recentlyOpened}</h2>
+              <p>{text.recentlyOpenedText}</p>
+            </div>
+          </div>
+          <div className="progress-list home-recent-list">
+            {recentStories.map(({ record, story }) => (
+              <ReadingProgressCard
+                key={record.storyId}
+                story={story}
+                record={record}
+                language={language}
+                text={text}
+                onContinue={onChooseStory}
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="category-recommendations" aria-labelledby="recommended-categories-title">
         <div className="section-heading">

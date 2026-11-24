@@ -1,5 +1,6 @@
 import { categories } from '../data/stories.js'
 import { getStoryDescription, getStoryTitle } from '../lib/storyContent.js'
+import AudioAvailabilityBadge from './AudioAvailabilityBadge.jsx'
 
 export default function StoryCard({ story, language, text, onChoose }) {
   const category = categories.find((item) => item.id === story.category)
@@ -24,6 +25,7 @@ export default function StoryCard({ story, language, text, onChoose }) {
           <span className="category-label">{category?.label[language]}</span>
           <span className="read-time">{story.minutes} {text.readTime}</span>
         </div>
+        <div className="story-audio-line"><AudioAvailabilityBadge story={story} language={language} text={text} /></div>
         <h3>{title}</h3>
         <p>{description}</p>
         <button className="text-button" type="button" onClick={() => onChoose(story)}>

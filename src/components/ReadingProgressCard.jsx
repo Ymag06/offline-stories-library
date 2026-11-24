@@ -1,4 +1,5 @@
 import { getStoryTitle } from '../lib/storyContent.js'
+import AudioAvailabilityBadge from './AudioAvailabilityBadge.jsx'
 
 export default function ReadingProgressCard({ story, record, language, text, onContinue }) {
   const totalPages = Math.max(1, record.totalPages || 1)
@@ -22,6 +23,7 @@ export default function ReadingProgressCard({ story, record, language, text, onC
         <div className="progress-track" role="progressbar" aria-label={text.progressTitle} aria-valuemin="0" aria-valuemax="100" aria-valuenow={percent}>
           <span style={{ width: `${percent}%` }} />
         </div>
+        <div className="progress-card-audio"><AudioAvailabilityBadge story={story} language={story.userCreated ? (story.language || language) : language} text={text} /></div>
         <div className="progress-card-footer">
           <small>{text.lastOpened}: {lastOpened}</small>
           <button className="text-button" type="button" onClick={() => onContinue(story)}>

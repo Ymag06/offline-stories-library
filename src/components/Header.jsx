@@ -1,5 +1,3 @@
-import LanguageSwitcher from './LanguageSwitcher.jsx'
-
 const navItems = [
   { id: 'home', icon: '⌂' },
   { id: 'library', icon: '▤' },
@@ -8,7 +6,7 @@ const navItems = [
   { id: 'settings', icon: '⚙' },
 ]
 
-export default function Header({ text, language, onLanguageChange, section, isStoryOpen, onNavigate }) {
+export default function Header({ text, section, isStoryOpen, onNavigate }) {
   return (
     <header className="topbar">
       <div className="topbar-inner">
@@ -31,8 +29,6 @@ export default function Header({ text, language, onLanguageChange, section, isSt
             </button>
           ))}
         </nav>
-
-        <LanguageSwitcher text={text} language={language} onChange={onLanguageChange} />
       </div>
     </header>
   )

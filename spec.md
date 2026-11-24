@@ -87,6 +87,8 @@ Requirements:
 - Users should be able to filter stories by category.
 - Users should be able to open and read stories.
 - The Library should contain built-in stories; user-written stories belong in My Stories.
+- Story cards should show whether audio is available for that story. Audio uses device text-to-speech rather than recorded files; use plain “Audio available/unavailable” labels.
+- If audio is unavailable, disable Listen in the story mode choice and explain that reading remains available.
 
 ### 3.3 Story Reader
 
@@ -100,8 +102,16 @@ Requirements:
 - Support readable font sizes.
 - Provide basic reading controls.
 - Allow users to navigate between pages.
+- Let readers switch between page-by-page and continuous-scroll layouts.
+- Put page navigation, text-size controls, and the layout switch beside the reading area in a collapsible toolbar.
+- In continuous-scroll mode, show the story in one connected reading surface, not separate page cards. Preserve internal page landmarks for progress tracking.
 - Remember the last reading position.
 - Allow users to resume reading.
+- When a story is opened, let the reader choose Read or Listen; recommend Read because offline speech voices depend on the device.
+- Listen with the browser's locally installed speech voice only; do not send story text to a service or require a network connection.
+- If no installed offline voice matching the story language is available, explain this and offer Read instead.
+- Listening controls must support play/pause and approximate backward/forward seeking with a seek bar and short skip buttons. Clearly label the time and position as approximate because text-to-speech does not provide a consistent audio timeline.
+- Advance through story pages during listening and save page-level reading progress so the user can resume at the saved page.
 - Provide a simple interface suitable for children.
 
 ### 3.4 Story Writing and Local Collection
@@ -134,6 +144,7 @@ Requirements:
 - Display reading progress.
 - Allow children to continue previously opened stories.
 - Store progress locally.
+- Save the current visible page when reading in continuous-scroll mode.
 
 ### 3.6 Child-Friendly Interface
 
@@ -197,7 +208,7 @@ The application should provide the following sections:
 
 1. Home
    - Featured stories.
-   - Recently opened stories.
+   - Recently opened unfinished built-in stories.
    - Recommended categories.
 
 2. Library
@@ -215,8 +226,11 @@ The application should provide the following sections:
    - Continue reading unfinished stories.
 
 5. Settings
-   - Manage basic reading preferences.
+   - Change the display language.
+   - Choose a light or dark theme.
    - Manage locally stored content.
+
+Settings should open in a compact side drawer rather than taking over the full page.
 
 ---
 
@@ -302,11 +316,12 @@ The first version should focus on delivering the essential reading experience.
 - [x] Save user-created stories persistently in local storage.
 - [x] Save reading progress.
 - [x] Resume reading.
+- [x] Offer optional local text-to-speech with pause, approximate seeking, and a reading fallback.
 - [ ] Responsive child-friendly interface.
 
 ### Future Improvements
 
-- [ ] Audio narration.
+- [ ] Add downloadable, offline narration voices if a safe, licensed, device-compatible approach is selected.
 - [ ] Multiple languages.
 - [ ] Interactive stories.
 - [ ] Reading comprehension quizzes.

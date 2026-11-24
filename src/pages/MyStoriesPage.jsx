@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import AudioAvailabilityBadge from '../components/AudioAvailabilityBadge.jsx'
 import { categories } from '../data/stories.js'
 import { getStoryDescription } from '../lib/storyContent.js'
 import { getAllUserStories, removeUserStory, saveUserStory } from '../lib/userStories.js'
@@ -265,6 +266,7 @@ export default function MyStoriesPage({ text, language, onChooseStory }) {
                     <span className="category-label">{category?.label[language] || text.writtenByYou}</span>
                     <span className="written-story-language">{story.language === 'my' ? text.burmese : text.english}</span>
                   </div>
+                  <div className="written-story-audio"><AudioAvailabilityBadge story={story} language={story.language || language} text={text} /></div>
                   <h2>{story.title}</h2>
                   <p>{story.description}</p>
                   <small className="written-story-parts">{partCount} {partCount === 1 ? text.storyPartOne : text.storyPartMany}</small>

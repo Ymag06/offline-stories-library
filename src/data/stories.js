@@ -32,6 +32,7 @@ export const stories = [
     icon: '⛵',
     art: 'boat',
     featured: true,
+    audioEnabled: false,
   },
   {
     id: 'bright-kite',
