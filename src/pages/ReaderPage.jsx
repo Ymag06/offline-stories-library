@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react'
-import { storyPages } from '../data/storyPages.js'
 import { getReadingProgress, saveReadingProgress } from '../lib/readingProgress.js'
+import { getStoryDescription, getStoryPages, getStoryTitle } from '../lib/storyContent.js'
 
 const MIN_TEXT_SIZE = 1
 const MAX_TEXT_SIZE = 1.5
 const TEXT_SIZE_STEP = 0.1
 
 export default function ReaderPage({ story, language, text, onBack }) {
-  const pageSet = storyPages[story.id]
-  const pages = pageSet?.[language] || pageSet?.en || []
+  const pages = getStoryPages(story, language)
   const totalPages = pages.length
   const [currentPage, setCurrentPage] = useState(0)
   const [textSize, setTextSize] = useState(1.2)
@@ -88,14 +87,14 @@ export default function ReaderPage({ story, language, text, onBack }) {
     <section className="reader-page" aria-labelledby="reader-title">
       <div className="reader-topline">
         <button className="back-button" type="button" onClick={onBack}>← {text.backToStories}</button>
-        <span className="eyebrow">{text.sample}</span>
+        <span className="eyebrow">{story.userCreated ? text.writtenByYou : text.sample}</span>
       </div>
       <header className="reader-heading">
         <div className={`reader-cover art-${story.art}`} aria-hidden="true"><span>{story.icon}</span></div>
         <div>
           <span className="category-label">{text.readerLabel}</span>
-          <h1 id="reader-title">{story.title[language]}</h1>
-          <p>{story.description[language]}</p>
+          <h1 id="reader-title">{getStoryTitle(story, language)}</h1>
+          <p>{getStoryDescription(story, language)}</p>
         </div>
       </header>
 

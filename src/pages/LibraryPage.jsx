@@ -2,9 +2,9 @@ import { useMemo, useState } from 'react'
 import StoryCard from '../components/StoryCard.jsx'
 import { categories, stories } from '../data/stories.js'
 
-export default function LibraryPage({ text, language, onChooseStory }) {
+export default function LibraryPage({ text, language, initialCategory = 'all', onChooseStory }) {
   const [query, setQuery] = useState('')
-  const [activeCategory, setActiveCategory] = useState('all')
+  const [activeCategory, setActiveCategory] = useState(initialCategory)
 
   const visibleStories = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase(language === 'my' ? 'my' : 'en')

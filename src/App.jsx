@@ -20,6 +20,7 @@ function readSavedLanguage() {
 export default function App() {
   const [language, setLanguage] = useState(readSavedLanguage)
   const [section, setSection] = useState('home')
+  const [libraryCategory, setLibraryCategory] = useState('all')
   const [selectedStory, setSelectedStory] = useState(null)
   const text = messages[language]
 
@@ -38,6 +39,11 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  const chooseCategory = (categoryId) => {
+    setLibraryCategory(categoryId)
+    navigate('library')
+  }
+
   return (
     <div className="app-shell min-h-screen">
       <Header
@@ -53,11 +59,11 @@ export default function App() {
         {selectedStory ? (
           <ReaderPage key={selectedStory.id} story={selectedStory} language={language} text={text} onBack={() => setSelectedStory(null)} />
         ) : section === 'home' ? (
-          <HomePage text={text} language={language} onNavigate={navigate} onChooseStory={setSelectedStory} />
+          <HomePage text={text} language={language} onNavigate={navigate} onChooseStory={setSelectedStory} onChooseCategory={chooseCategory} />
         ) : section === 'library' ? (
-          <LibraryPage text={text} language={language} onChooseStory={setSelectedStory} />
+          <LibraryPage text={text} language={language} initialCategory={libraryCategory} onChooseStory={setSelectedStory} />
         ) : section === 'myStories' ? (
-          <MyStoriesPage text={text} />
+          <MyStoriesPage text={text} language={language} onChooseStory={setSelectedStory} />
         ) : section === 'progress' ? (
           <ProgressPage text={text} language={language} onContinueStory={setSelectedStory} />
         ) : (

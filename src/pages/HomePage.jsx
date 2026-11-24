@@ -1,8 +1,15 @@
 import StoryCard from '../components/StoryCard.jsx'
+import CategoryRecommendationCard from '../components/CategoryRecommendationCard.jsx'
 import { categories, stories } from '../data/stories.js'
 
-export default function HomePage({ text, language, onNavigate, onChooseStory }) {
+export default function HomePage({ text, language, onNavigate, onChooseStory, onChooseCategory }) {
   const featuredStories = stories.filter((story) => story.featured)
+  const recommendedCategories = categories
+    .filter((category) => category.id !== 'all')
+    .map((category) => ({
+      ...category,
+      storyCount: stories.filter((story) => story.category === category.id).length,
+    }))
 
   return (
     <>
@@ -44,6 +51,28 @@ export default function HomePage({ text, language, onNavigate, onChooseStory }) 
         <div className="story-grid">
           {featuredStories.map((story) => (
             <StoryCard key={story.id} story={story} language={language} text={text} onChoose={onChooseStory} />
+          ))}
+        </div>
+      </section>
+
+      <section className="category-recommendations" aria-labelledby="recommended-categories-title">
+        <div className="section-heading">
+          <div>
+            <span className="eyebrow">{text.brand}</span>
+            <h2 id="recommended-categories-title">{text.recommendedCategories}</h2>
+            <p>{text.recommendedCategoriesText}</p>
+          </div>
+        </div>
+        <div className="category-recommendation-grid">
+          {recommendedCategories.map((category) => (
+            <CategoryRecommendationCard
+              key={category.id}
+              category={category}
+              count={category.storyCount}
+              language={language}
+              text={text}
+              onChoose={onChooseCategory}
+            />
           ))}
         </div>
       </section>

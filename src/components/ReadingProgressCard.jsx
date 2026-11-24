@@ -1,3 +1,5 @@
+import { getStoryTitle } from '../lib/storyContent.js'
+
 export default function ReadingProgressCard({ story, record, language, text, onContinue }) {
   const totalPages = Math.max(1, record.totalPages || 1)
   const percent = record.completed
@@ -13,7 +15,7 @@ export default function ReadingProgressCard({ story, record, language, text, onC
         <div className="progress-card-heading">
           <div>
             <span className="category-label">{record.completed ? text.completed : `${percent}% ${text.read}`}</span>
-            <h2>{story.title[language]}</h2>
+            <h2>{getStoryTitle(story, language)}</h2>
           </div>
           <span className="progress-page-count">{record.lastPosition + 1}/{totalPages}</span>
         </div>

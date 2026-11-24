@@ -1,9 +1,9 @@
 export const categories = [
   { id: 'all', label: { en: 'All stories', my: 'ပုံပြင်အားလုံး' } },
-  { id: 'nature', label: { en: 'Nature', my: 'သဘာဝ' } },
-  { id: 'adventure', label: { en: 'Adventure', my: 'စွန့်စားခန်း' } },
-  { id: 'friendship', label: { en: 'Friendship', my: 'မိတ်ဆွေများ' } },
-  { id: 'learning', label: { en: 'Learning', my: 'လေ့လာသင်ယူခြင်း' } },
+  { id: 'nature', label: { en: 'Nature', my: 'သဘာဝ' }, icon: '🌿', art: 'nature', hint: { en: 'Animals, plants, and outdoor wonders.', my: 'တိရစ္ဆာန်၊ အပင်နှင့် သဘာဝအံ့ဖွယ်များအကြောင်း။' } },
+  { id: 'adventure', label: { en: 'Adventure', my: 'စွန့်စားခန်း' }, icon: '🧭', art: 'adventure', hint: { en: 'Set off on a small, exciting journey.', my: 'စိတ်လှုပ်ရှားဖွယ် ခရီးလေးတစ်ခုကို စတင်လိုက်ပါ။' } },
+  { id: 'friendship', label: { en: 'Friendship', my: 'မိတ်ဆွေများ' }, icon: '♡', art: 'friendship', hint: { en: 'Meet kind friends and solve things together.', my: 'မိတ်ဆွေကောင်းများနှင့် တွေ့ဆုံပြီး အတူတကွ ဖြေရှင်းကြပါ။' } },
+  { id: 'learning', label: { en: 'Learning', my: 'လေ့လာသင်ယူခြင်း' }, icon: '✦', art: 'learning', hint: { en: 'Discover a new idea in every story.', my: 'ပုံပြင်တစ်ပုဒ်စီမှ စိတ်ကူးအသစ်များကို ရှာဖွေပါ။' } },
 ]
 
 export const stories = [

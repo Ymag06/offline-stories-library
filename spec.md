@@ -8,7 +8,7 @@ Offline Digital Story Library
 
 ### Description
 
-An offline-first digital library designed to provide children with free access to educational stories and reading materials, particularly children who have limited access to formal education, libraries, or the internet.
+An offline-first digital library designed to provide children with free access to educational stories and reading materials, particularly children who have limited access to formal education, libraries, or the internet. Children can also write and save their own stories in the app.
 
 The application allows children to explore, read, and learn from a collection of digital stories without requiring an internet connection, an account, or a paid subscription.
 
@@ -49,7 +49,7 @@ The application should allow users to:
 
 - Browse available stories.
 - Read stories without internet access.
-- Import additional stories from local storage.
+- Write original stories in the app and save them in a local collection.
 - Organise stories into categories.
 - Continue reading from where they stopped.
 
@@ -86,7 +86,7 @@ Requirements:
 - Users should be able to search for stories.
 - Users should be able to filter stories by category.
 - Users should be able to open and read stories.
-- The library should support different reading materials.
+- The Library should contain built-in stories; user-written stories belong in My Stories.
 
 ### 3.3 Story Reader
 
@@ -104,21 +104,22 @@ Requirements:
 - Allow users to resume reading.
 - Provide a simple interface suitable for children.
 
-### 3.4 Local Story Import
+### 3.4 Story Writing and Local Collection
 
 **Priority: High**
 
-Users should be able to add their own reading materials from their devices.
+Users should be able to create and manage their own stories in the app.
 
 Requirements:
 
-- Allow users to import supported files from local storage.
-- Support PDF files initially.
-- Store imported stories locally.
-- Imported stories must remain available after restarting the application.
-- Allow users to remove imported stories.
-- Display imported stories in the library.
-- Validate imported files before saving them.
+- Provide a guided writing form with prompts for the beginning, middle, and ending.
+- Allow the author to set a title, choose English or Burmese for the story, and optionally select a category.
+- Store story text and metadata locally in IndexedDB.
+- User-written stories must remain available after restarting the application and must work offline.
+- Display user-written stories in My Stories.
+- Allow users to read, edit, and remove their own stories.
+- Treat story text as plain text when displaying it.
+- Do not accept arbitrary file uploads in the v1 prototype.
 
 ### 3.5 Reading Progress
 
@@ -166,7 +167,7 @@ Requirements:
 
 ### Local Storage
 
-- IndexedDB for storing imported stories and persistent application data.
+- IndexedDB for storing user-written stories and persistent application data.
 - Local storage for small settings where appropriate.
 
 ### Offline Support
@@ -174,9 +175,9 @@ Requirements:
 - Service Worker for caching application resources.
 - PWA support for installation and offline launching.
 
-### File Support
+### User-Written Content
 
-- PDF (initial release).
+- Story text written in the app and saved in IndexedDB.
 
 ### Important Technical Constraints
 
@@ -205,9 +206,9 @@ The application should provide the following sections:
    - Filter by category.
 
 3. My Stories
-   - View imported stories.
-   - Import new stories.
-   - Remove imported stories.
+   - View user-written stories.
+   - Write and edit stories using beginning, middle, and ending prompts.
+   - Read or remove user-written stories.
 
 4. Reading Progress
    - View completed stories.
@@ -232,8 +233,9 @@ Each story should contain:
 - Description
 - Cover image
 - Category
-- File location
-- Source (built-in or imported)
+- Story pages or sections
+- Story language
+- Source (built-in or user-written)
 
 ### Reading Progress Data
 
@@ -246,7 +248,7 @@ Each reading progress record should contain:
 
 ### Data Persistence
 
-- Imported stories must remain available after restarting the application.
+- User-written stories must remain available after restarting the application.
 - Reading progress must persist between sessions.
 - Removing a story should not accidentally remove unrelated reading progress or content.
 
@@ -281,7 +283,7 @@ Since the application is designed for children:
 - No unnecessary personal information should be collected.
 - No advertisements should be displayed.
 - No external tracking should be implemented.
-- Imported files should be validated.
+- User-authored text should be rendered as plain text and remain local to the device.
 - The application should not expose children to external websites without appropriate safeguards.
 
 ---
@@ -293,14 +295,13 @@ The first version should focus on delivering the essential reading experience.
 ### Must Have
 
 - [ ] Offline application startup.
-- [ ] Browse built-in stories.
-- [ ] Story categories.
-- [ ] Search functionality.
-- [ ] Read PDF stories.
-- [ ] Import local PDF files.
-- [ ] Persistent local story storage.
-- [ ] Save reading progress.
-- [ ] Resume reading.
+- [x] Browse built-in stories.
+- [x] Story categories.
+- [x] Search functionality.
+- [x] Write, edit, and remove user-created stories.
+- [x] Save user-created stories persistently in local storage.
+- [x] Save reading progress.
+- [x] Resume reading.
 - [ ] Responsive child-friendly interface.
 
 ### Future Improvements
@@ -311,7 +312,7 @@ The first version should focus on delivering the essential reading experience.
 - [ ] Reading comprehension quizzes.
 - [ ] Educational games.
 - [ ] Reading recommendations.
-- [ ] More supported file formats.
+- [ ] More story-writing and creative tools.
 - [ ] Offline content update system.
 - [ ] Learning materials beyond stories.
 
@@ -323,8 +324,8 @@ The project will be considered successful when:
 
 1. Children can access the library without an internet connection.
 2. Users can read the preloaded stories completely offline.
-3. Users can import and access additional stories.
-4. Imported content remains available after restarting the application.
+3. Users can write, save, and access their own stories.
+4. User-written content remains available after restarting the application.
 5. Reading progress is saved correctly.
 6. The application is usable on low-cost devices.
 7. Children can navigate the application without complicated instructions.

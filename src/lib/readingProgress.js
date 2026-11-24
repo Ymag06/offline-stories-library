@@ -1,43 +1,7 @@
-const DATABASE_NAME = 'offline-story-library'
-const DATABASE_VERSION = 1
-const PROGRESS_STORE = 'reading-progress'
-
-let databasePromise
-
-function openDatabase() {
-  if (!globalThis.indexedDB) {
-    return Promise.reject(new Error('IndexedDB is not available in this browser.'))
-  }
-
-  if (!databasePromise) {
-    databasePromise = new Promise((resolve, reject) => {
-      const request = globalThis.indexedDB.open(DATABASE_NAME, DATABASE_VERSION)
-
-      request.onupgradeneeded = () => {
-        const database = request.result
-        if (!database.objectStoreNames.contains(PROGRESS_STORE)) {
-          database.createObjectStore(PROGRESS_STORE, { keyPath: 'storyId' })
-        }
-      }
-
-      request.onsuccess = () => {
-        const database = request.result
-        database.onversionchange = () => database.close()
-        resolve(database)
-      }
-
-      request.onerror = () => reject(request.error || new Error('Could not open local reading storage.'))
-    }).catch((error) => {
-      databasePromise = undefined
-      throw error
-    })
-  }
-
-  return databasePromise
-}
+import { openLocalDatabase, PROGRESS_STORE } from './localDatabase.js'
 
 export async function getReadingProgress(storyId) {
-  const database = await openDatabase()
+  const database = await openLocalDatabase()
 
   return new Promise((resolve, reject) => {
     const transaction = database.transaction(PROGRESS_STORE, 'readonly')
@@ -49,7 +13,7 @@ export async function getReadingProgress(storyId) {
 }
 
 export async function getAllReadingProgress() {
-  const database = await openDatabase()
+  const database = await openLocalDatabase()
 
   return new Promise((resolve, reject) => {
     const transaction = database.transaction(PROGRESS_STORE, 'readonly')
@@ -61,7 +25,7 @@ export async function getAllReadingProgress() {
 }
 
 export async function saveReadingProgress(progress) {
-  const database = await openDatabase()
+  const database = await openLocalDatabase()
 
   return new Promise((resolve, reject) => {
     const transaction = database.transaction(PROGRESS_STORE, 'readwrite')

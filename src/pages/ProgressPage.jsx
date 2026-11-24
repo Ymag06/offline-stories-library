@@ -3,6 +3,7 @@ import EmptyPage from '../components/EmptyPage.jsx'
 import ReadingProgressCard from '../components/ReadingProgressCard.jsx'
 import { stories } from '../data/stories.js'
 import { getAllReadingProgress } from '../lib/readingProgress.js'
+import { getAllUserStories } from '../lib/userStories.js'
 
 export default function ProgressPage({ text, language, onContinueStory }) {
   const [records, setRecords] = useState([])
@@ -11,10 +12,14 @@ export default function ProgressPage({ text, language, onContinueStory }) {
   useEffect(() => {
     let active = true
 
-    getAllReadingProgress()
-      .then((items) => {
+    Promise.all([getAllReadingProgress(), getAllUserStories()])
+      .then(([items, userStories]) => {
         if (!active) return
-        setRecords(items.sort((first, second) => new Date(second.lastOpenedAt) - new Date(first.lastOpenedAt)))
+        const knownStories = new Map([...stories, ...userStories].map((story) => [story.id, story]))
+        setRecords(items
+          .map((record) => ({ record, story: knownStories.get(record.storyId) }))
+          .filter((item) => item.story)
+          .sort((first, second) => new Date(second.record.lastOpenedAt) - new Date(first.record.lastOpenedAt)))
         setStatus('ready')
       })
       .catch(() => {
@@ -32,11 +37,7 @@ export default function ProgressPage({ text, language, onContinueStory }) {
     return <EmptyPage icon="◷" brand={text.brand} title={text.progressTitle} body={text.progressStorageError} note={text.startReading} />
   }
 
-  const storiesWithProgress = records
-    .map((record) => ({ record, story: stories.find((item) => item.id === record.storyId) }))
-    .filter((item) => item.story)
-
-  if (storiesWithProgress.length === 0) {
+  if (records.length === 0) {
     return <EmptyPage icon="◷" brand={text.brand} title={text.progressTitle} body={text.progressText} note={text.startReading} />
   }
 
@@ -46,7 +47,7 @@ export default function ProgressPage({ text, language, onContinueStory }) {
         <div><span className="eyebrow">{text.brand}</span><h1>{text.progressTitle}</h1><p>{text.progressText}</p></div>
       </div>
       <div className="progress-list">
-        {storiesWithProgress.map(({ record, story }) => (
+        {records.map(({ record, story }) => (
           <ReadingProgressCard
             key={record.storyId}
             story={story}
