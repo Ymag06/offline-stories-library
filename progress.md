@@ -69,6 +69,7 @@ The prototype includes a bilingual sample-story reader, guided on-device story w
 - Simplified visible audio messages to plain language and pause narration while the Settings drawer is open.
 - Increased selected-state contrast in dark mode for the reader layout buttons and category chips using white text on dark green.
 - `npm.cmd run build` passed after the latest audio, content, reader-scroll, and Settings drawer updates.
+- Pushed commit `004d9be` (`Add local story audio and reader controls`) to `origin/main`; the production build passed and no type-check script is configured. Vercel deployment remains deferred pending MVP manual review.
 
 ## Next steps
 
