@@ -9,7 +9,7 @@ export default function StoryCard({ story, language, text, onChoose }) {
         className={`story-cover art-${story.art}`}
         onClick={() => onChoose(story)}
         type="button"
-        aria-label={`${text.sample}: ${story.title[language]}`}
+        aria-label={`${text.openStory}: ${story.title[language]}`}
       >
         <span className="cover-spark cover-spark-one" aria-hidden="true" />
         <span className="cover-spark cover-spark-two" aria-hidden="true" />
@@ -24,7 +24,7 @@ export default function StoryCard({ story, language, text, onChoose }) {
         <h3>{story.title[language]}</h3>
         <p>{story.description[language]}</p>
         <button className="text-button" type="button" onClick={() => onChoose(story)}>
-          {text.sample} <span aria-hidden="true">↗</span>
+          {text.openStory} <span aria-hidden="true">↗</span>
         </button>
       </div>
     </article>

@@ -11,8 +11,9 @@ The initial app shell is scaffolded and implementation is proceeding in small st
 - Target both an installable browser PWA and an Android release.
 - Support English and Burmese, with layouts responsive across phone, tablet, and desktop screen sizes. Default to English and provide an immediate language switch; keep the choice in small local settings.
 - Use clearly identified fictional placeholder stories for the initial implementation. The prototype may include Burmese placeholder copy, but it needs fluent review before distribution. Do not imply that placeholder stories are published or licensed reading material.
+- Sample reader pages should be bilingual and follow the selected app language.
 - Keep project skills in `.agents/skills/` so they can be shared with collaborators.
-- GitHub repository, branch, and deployment provider are undecided. Do not invent or configure a remote or deployment target.
+- GitHub origin is `https://github.com/Ymag06/offline-stories-library.git`, with `main` as the collaboration branch. The deployment provider remains undecided. Do not change the remote or configure a deployment target without the user's direction.
 
 ## Product and technical constraints
 

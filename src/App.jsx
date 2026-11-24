@@ -6,7 +6,7 @@ import LibraryPage from './pages/LibraryPage.jsx'
 import MyStoriesPage from './pages/MyStoriesPage.jsx'
 import ProgressPage from './pages/ProgressPage.jsx'
 import SettingsPage from './pages/SettingsPage.jsx'
-import StoryDetailPage from './pages/StoryDetailPage.jsx'
+import ReaderPage from './pages/ReaderPage.jsx'
 import { messages } from './i18n.js'
 
 function readSavedLanguage() {
@@ -51,7 +51,7 @@ export default function App() {
 
       <main className="page-shell mx-auto w-full">
         {selectedStory ? (
-          <StoryDetailPage story={selectedStory} language={language} text={text} onBack={() => setSelectedStory(null)} />
+          <ReaderPage key={selectedStory.id} story={selectedStory} language={language} text={text} onBack={() => setSelectedStory(null)} />
         ) : section === 'home' ? (
           <HomePage text={text} language={language} onNavigate={navigate} onChooseStory={setSelectedStory} />
         ) : section === 'library' ? (
@@ -59,7 +59,7 @@ export default function App() {
         ) : section === 'myStories' ? (
           <MyStoriesPage text={text} />
         ) : section === 'progress' ? (
-          <ProgressPage text={text} />
+          <ProgressPage text={text} language={language} onContinueStory={setSelectedStory} />
         ) : (
           <SettingsPage text={text} language={language} onLanguageChange={setLanguage} />
         )}
