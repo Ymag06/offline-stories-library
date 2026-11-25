@@ -26,6 +26,7 @@ The initial app shell is scaffolded and implementation is proceeding in small st
 - Use bundled/local assets and readable, child-friendly layouts. Keep English and Burmese text support in mind in components and typography; do not rely on an internet font service.
 - Removing one user-written story may remove its own progress, but must not delete unrelated stories or reading progress.
 - When a story opens, offer Read or Listen and recommend Read. Listening must use a locally installed browser speech voice matching the story language; never send story text to a remote TTS service.
+- During Listen, highlight the currently spoken word using browser word-boundary events. Support English and Burmese segmentation, and do not show a misleading approximate word highlight when the browser provides no word boundaries.
 - Show simple Audio available/unavailable status on story cards based on device text-to-speech support for the story language; do not expose technical voice details to readers.
 - When audio is unavailable, disable Listen in the story choice and keep Read available. If speech fails after it starts, offer a direct switch to reading.
 - Keep one fictional sample story intentionally unavailable for audio as a prototype state, even when the device supports narration.

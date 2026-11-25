@@ -111,6 +111,7 @@ Requirements:
 - Listen with the browser's locally installed speech voice only; do not send story text to a service or require a network connection.
 - If no installed offline voice matching the story language is available, explain this and offer Read instead.
 - Listening controls must support play/pause and approximate backward/forward seeking with a seek bar and short skip buttons. Clearly label the time and position as approximate because text-to-speech does not provide a consistent audio timeline.
+- While listening, highlight the word currently being spoken using the browser's word-boundary events. Support English and Burmese text segmentation; do not show an inaccurate approximate word highlight when word boundaries are unavailable.
 - Advance through story pages during listening and save page-level reading progress so the user can resume at the saved page.
 - Provide a simple interface suitable for children.
 

@@ -4,7 +4,7 @@ Last updated: 2026-11-25
 
 ## Current status
 
-The prototype includes a bilingual sample-story reader, guided on-device story writing, recommended categories, recently opened stories, local text-to-speech, responsive reader controls, connected scroll/page layouts, audio-availability states, and saved light/dark themes in a settings drawer. The production build passes; visual and device voice behavior still need manual verification. Vercel is selected for production hosting, but deployment is deferred until the agreed MVP features are complete.
+The prototype includes a bilingual sample-story reader, guided on-device story writing, recommended categories, recently opened stories, local text-to-speech with current-word highlighting, responsive reader controls, connected scroll/page layouts, audio-availability states, and saved light/dark themes in a settings drawer. The production build passes; visual and device voice behavior still need manual verification. Vercel is selected for production hosting, but deployment is deferred until the agreed MVP features are complete.
 
 ## Decisions
 
@@ -21,6 +21,7 @@ The prototype includes a bilingual sample-story reader, guided on-device story w
 - **User story placement:** user-written stories appear only in My Stories; they are not included in the built-in Library.
 - **Home recents:** show only unfinished built-in stories in the recently opened section.
 - **Story audio:** opening a story offers Read or Listen, with Read recommended. Listen uses only an installed local voice matching the story language; if unavailable, explain and offer Read instead. Page-level progress is saved so listening resumes at the saved page.
+- **Spoken-word highlight:** while listening, highlight the current spoken word from browser word-boundary events. If a browser does not provide word boundaries, do not display an inaccurate highlight.
 - **Audio controls:** support pause/resume, a seek bar, and approximately five-second skip buttons. Show approximate time because speech synthesis does not expose a consistent seekable audio timeline.
 - **User-story voice:** use the language selected for the story, independent of the current interface language.
 - **Audio availability labels:** story cards indicate whether the device has a matching locally installed offline TTS voice, not whether there is a pre-recorded audio file.
@@ -70,6 +71,8 @@ The prototype includes a bilingual sample-story reader, guided on-device story w
 - Increased selected-state contrast in dark mode for the reader layout buttons and category chips using white text on dark green.
 - `npm.cmd run build` passed after the latest audio, content, reader-scroll, and Settings drawer updates.
 - Pushed commit `004d9be` (`Add local story audio and reader controls`) to `origin/main`; the production build passed and no type-check script is configured. Vercel deployment remains deferred pending MVP manual review.
+- Added current-word highlighting during local narration, with English/Burmese word segmentation and a theme-aware marker. Browsers without word-boundary events leave the story text unmarked.
+- `npm.cmd run build` passed after the current-word highlighting update; manual voice-boundary behavior still needs device verification.
 
 ## Next steps
 

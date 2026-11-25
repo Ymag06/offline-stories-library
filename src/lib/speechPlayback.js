@@ -1,3 +1,5 @@
+import { getWordRanges } from './textSegmentation.js'
+
 export function matchingVoice(voices, language) {
   const languageCode = language === 'my' ? 'my' : 'en'
   return voices
@@ -29,25 +31,10 @@ export function waitForLocalVoice(synthesis, language, timeoutMs = 1400) {
 }
 
 export function createSpeechTiming(text, language) {
-  let wordStarts = []
-
-  try {
-    if (Intl.Segmenter) {
-      const locale = language === 'my' ? 'my-MM' : 'en-US'
-      wordStarts = [...new Intl.Segmenter(locale, { granularity: 'word' }).segment(text)]
-        .filter((part) => part.isWordLike)
-        .map((part) => part.index)
-    }
-  } catch {
-    wordStarts = []
-  }
-
-  if (wordStarts.length === 0) {
-    wordStarts = [...text.matchAll(/\S+/gu)].map((match) => match.index)
-  }
-
+  const wordRanges = getWordRanges(text, language)
+  const wordStarts = wordRanges.map(({ start }) => start)
   const duration = Math.max(1, Math.ceil(wordStarts.length / 2.6))
-  return { duration, wordStarts }
+  return { duration, wordStarts, wordRanges }
 }
 
 export function characterAtApproximateTime(seconds, timing) {

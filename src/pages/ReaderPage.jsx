@@ -7,6 +7,20 @@ const MIN_TEXT_SIZE = 1
 const MAX_TEXT_SIZE = 1.5
 const TEXT_SIZE_STEP = 0.1
 
+function renderStoryText(content, activeWord) {
+  if (!activeWord || activeWord.start < 0 || activeWord.end <= activeWord.start || activeWord.end > content.length) {
+    return content
+  }
+
+  return (
+    <>
+      {content.slice(0, activeWord.start)}
+      <mark className="reader-current-word">{content.slice(activeWord.start, activeWord.end)}</mark>
+      {content.slice(activeWord.end)}
+    </>
+  )
+}
+
 export default function ReaderPage({ story, mode, language, text, onBack, suspendAudio = false }) {
   const pages = getStoryPages(story, language)
   const totalPages = pages.length
@@ -18,12 +32,14 @@ export default function ReaderPage({ story, mode, language, text, onBack, suspen
   const [controlsCollapsed, setControlsCollapsed] = useState(false)
   const [progressLoaded, setProgressLoaded] = useState(false)
   const [storageError, setStorageError] = useState(false)
+  const [activeWord, setActiveWord] = useState(null)
   const pageElementsRef = useRef([])
 
   useEffect(() => {
     let active = true
     setProgressLoaded(false)
     setStorageError(false)
+    setActiveWord(null)
 
     getReadingProgress(story.id)
       .then((record) => {
@@ -100,6 +116,7 @@ export default function ReaderPage({ story, mode, language, text, onBack, suspen
 
   const goToPage = (nextPage) => {
     const boundedPage = Math.min(Math.max(nextPage, 0), Math.max(totalPages - 1, 0))
+    setActiveWord(null)
     setCurrentPage(boundedPage)
     if (boundedPage === totalPages - 1) setCompleted(true)
     if (layoutMode === 'scroll') {
@@ -110,6 +127,7 @@ export default function ReaderPage({ story, mode, language, text, onBack, suspen
   const handleAudioPageComplete = useCallback(() => {
     if (currentPage < totalPages - 1) {
       const nextPage = Math.min(currentPage + 1, totalPages - 1)
+      setActiveWord(null)
       setCurrentPage(nextPage)
       if (layoutMode === 'scroll') {
         window.requestAnimationFrame(() => pageElementsRef.current[nextPage]?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
@@ -118,6 +136,15 @@ export default function ReaderPage({ story, mode, language, text, onBack, suspen
       setCompleted(true)
     }
   }, [currentPage, layoutMode, totalPages])
+
+  const handleWordBoundary = useCallback((wordRange) => {
+    setActiveWord(wordRange ? { ...wordRange, pageIndex: currentPage } : null)
+  }, [currentPage])
+
+  const textForPage = (pageText, pageIndex) => renderStoryText(
+    pageText,
+    activeMode === 'listen' && activeWord?.pageIndex === pageIndex ? activeWord : null,
+  )
 
   const pageNumber = currentPage + 1
   const percent = totalPages ? Math.round((pageNumber / totalPages) * 100) : 0
@@ -158,9 +185,9 @@ export default function ReaderPage({ story, mode, language, text, onBack, suspen
       <div className={`reader-workspace${controlsCollapsed ? ' reader-workspace-collapsed' : ''}`}>
         <div className="reader-reading-column">
           {layoutMode === 'pages' ? (
-            <article ref={(element) => { pageElementsRef.current[currentPage] = element }} className="reader-paper" aria-live="polite">
+            <article ref={(element) => { pageElementsRef.current[currentPage] = element }} className="reader-paper">
               <div className="reader-paper-top"><span>{text.brand}</span><span>{String(pageNumber).padStart(2, '0')}</span></div>
-              <p className="reader-story-text" style={{ fontSize: `${textSize}rem` }}>{pages[currentPage]}</p>
+              <p className="reader-story-text" style={{ fontSize: `${textSize}rem` }}>{textForPage(pages[currentPage], currentPage)}</p>
               {completed && currentPage === totalPages - 1 && <p className="reader-complete" role="status">✦ {text.readerComplete}</p>}
             </article>
           ) : (
@@ -175,7 +202,7 @@ export default function ReaderPage({ story, mode, language, text, onBack, suspen
                     aria-label={`${text.page} ${index + 1} ${text.of} ${totalPages}`}
                     aria-current={index === currentPage ? 'true' : undefined}
                   >
-                    <p className="reader-story-text" style={{ fontSize: `${textSize}rem` }}>{pageText}</p>
+                    <p className="reader-story-text" style={{ fontSize: `${textSize}rem` }}>{textForPage(pageText, index)}</p>
                   </section>
                 ))}
               </div>
@@ -190,7 +217,8 @@ export default function ReaderPage({ story, mode, language, text, onBack, suspen
               language={story.userCreated ? (story.language || language) : language}
               labels={text}
               onPageComplete={handleAudioPageComplete}
-              onReadInstead={() => setActiveMode('read')}
+              onWordBoundary={handleWordBoundary}
+              onReadInstead={() => { setActiveWord(null); setActiveMode('read') }}
               suspendAudio={suspendAudio}
             />
           )}

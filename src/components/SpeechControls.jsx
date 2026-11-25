@@ -5,6 +5,7 @@ import {
   createSpeechTiming,
   waitForLocalVoice,
 } from '../lib/speechPlayback.js'
+import { wordRangeAtCharacter } from '../lib/textSegmentation.js'
 
 const SEEK_SECONDS = 5
 
@@ -13,7 +14,7 @@ function formatTime(seconds) {
   return `${Math.floor(bounded / 60)}:${String(bounded % 60).padStart(2, '0')}`
 }
 
-export default function SpeechControls({ storyText, language, labels, onPageComplete, onReadInstead, suspendAudio = false }) {
+export default function SpeechControls({ storyText, language, labels, onPageComplete, onWordBoundary, onReadInstead, suspendAudio = false }) {
   const timing = useMemo(() => createSpeechTiming(storyText, language), [storyText, language])
   const [voice, setVoice] = useState(null)
   const [status, setStatus] = useState('checking')
@@ -28,8 +29,10 @@ export default function SpeechControls({ storyText, language, labels, onPageComp
   const anchorPositionRef = useRef(0)
   const startedAtRef = useRef(0)
   const pageCompleteRef = useRef(onPageComplete)
+  const wordBoundaryRef = useRef(onWordBoundary)
 
   useEffect(() => { pageCompleteRef.current = onPageComplete }, [onPageComplete])
+  useEffect(() => { wordBoundaryRef.current = onWordBoundary }, [onWordBoundary])
 
   const updatePosition = useCallback((nextPosition) => {
     const bounded = Math.max(0, Math.min(timing.duration, nextPosition))
@@ -48,11 +51,15 @@ export default function SpeechControls({ storyText, language, labels, onPageComp
     const generation = generationRef.current
     synthesis.cancel()
     updatePosition(startPosition)
+    wordBoundaryRef.current?.(null)
     anchorPositionRef.current = startPosition
     startedAtRef.current = Date.now()
 
     if (!playImmediately || characterIndex >= storyText.length) {
       utteranceRef.current = null
+      if (!playImmediately && characterIndex < storyText.length) {
+        wordBoundaryRef.current?.(wordRangeAtCharacter(timing.wordRanges, characterIndex))
+      }
       setStatus(playImmediately ? 'ended' : 'paused')
       if (playImmediately && characterIndex >= storyText.length) pageCompleteRef.current?.()
       return
@@ -67,6 +74,12 @@ export default function SpeechControls({ storyText, language, labels, onPageComp
       if (generation !== generationRef.current || !Number.isFinite(event.charIndex)) return
       const absoluteCharacter = characterIndex + event.charIndex
       updatePosition(approximateTimeAtCharacter(absoluteCharacter, storyText, timing))
+      const boundaryName = String(event.name || '').toLowerCase()
+      if (!boundaryName || boundaryName === 'word') {
+        wordBoundaryRef.current?.(wordRangeAtCharacter(timing.wordRanges, absoluteCharacter))
+      } else {
+        wordBoundaryRef.current?.(null)
+      }
     }
     utterance.onend = () => {
       if (generation !== generationRef.current) return
@@ -78,6 +91,7 @@ export default function SpeechControls({ storyText, language, labels, onPageComp
     utterance.onerror = (event) => {
       if (generation !== generationRef.current || event.error === 'canceled' || event.error === 'interrupted') return
       utteranceRef.current = null
+      wordBoundaryRef.current?.(null)
       setStatus('error')
     }
 

@@ -187,6 +187,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid #e2a43b; outline-
 .reader-paper { min-height: 285px; padding: 25px clamp(22px, 5vw, 55px) 27px; border: 1px solid rgba(28,48,43,.09); border-radius: 21px; background: #fffefb; box-shadow: 0 11px 30px rgba(44,57,47,.045); }
 .reader-paper-top { display: flex; align-items: center; justify-content: space-between; padding-bottom: 13px; border-bottom: 1px solid rgba(28,48,43,.1); color: #87958b; font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
 .reader-story-text { max-width: 700px; margin: 33px auto 20px; color: #263b31; font-family: Georgia, "Noto Serif Myanmar", "Myanmar Text", "Pyidaungsu", serif; line-height: 2.05; white-space: pre-line; }
+.reader-current-word { border-radius: .2em; color: #27311f; background: #f4d574; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
 .reader-complete { display: flex; align-items: center; gap: 8px; margin: 25px 0 0; color: #538061; font-size: 12px; font-weight: 800; }
 .reader-progress-line, .progress-track { height: 7px; overflow: hidden; border-radius: 999px; background: #e8ece3; }
 .reader-progress-line { margin-top: 19px; }.reader-progress-line span, .progress-track span { display: block; height: 100%; border-radius: inherit; background: #75a783; transition: width .2s ease; }
@@ -525,6 +526,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid #e2a43b; outline-
 :root[data-theme="dark"] .audio-availability-checking { border-color: var(--line); color: #c4cec7; background: #29342e; }
 :root[data-theme="dark"] .reader-paper { border-color: var(--line); background: var(--reader-paper); }
 :root[data-theme="dark"] .reader-paper-top { border-color: var(--line); color: #afbeb4; }
+:root[data-theme="dark"] .reader-current-word { color: #202819; background: #f2cf5e; }
 :root[data-theme="dark"] .reader-complete { color: #a6d9b0; }
 :root[data-theme="dark"] .reader-control-button:disabled,
 :root[data-theme="dark"] .reader-sidebar-navigation button:disabled { border-color: var(--line); color: #aab7ae; background: #29352e; opacity: 1; }
