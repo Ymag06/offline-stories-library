@@ -73,6 +73,7 @@ The prototype includes a bilingual sample-story reader, guided on-device story w
 - Pushed commit `004d9be` (`Add local story audio and reader controls`) to `origin/main`; the production build passed and no type-check script is configured. Vercel deployment remains deferred pending MVP manual review.
 - Added current-word highlighting during local narration, with English/Burmese word segmentation and a theme-aware marker. Browsers without word-boundary events leave the story text unmarked.
 - `npm.cmd run build` passed after the current-word highlighting update; manual voice-boundary behavior still needs device verification.
+- Pushed commit `89f9dcf` (`Highlight spoken words during story audio`) to `origin/main`. No type-check script is configured; Vercel deployment remains deferred until MVP review.
 
 ## Next steps
 
