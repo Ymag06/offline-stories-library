@@ -89,7 +89,7 @@ export default function App() {
 
   return (
     <>
-      <div className="app-shell min-h-screen">
+      <div className="min-h-screen overflow-hidden bg-cream text-ink">
         <Header
           text={text}
           section={section}
@@ -97,7 +97,7 @@ export default function App() {
           onNavigate={navigate}
         />
 
-        <main className="page-shell mx-auto w-full">
+        <main className="mx-auto min-h-[calc(100vh-82px)] w-full max-w-[1180px] px-[42px] pt-[38px] pb-[28px] max-wide:px-6 max-tablet:min-h-[calc(100vh-112px)] max-tablet:px-5 max-tablet:py-[26px] max-compact:px-[14px] max-compact:pt-[18px] max-compact:pb-[23px]">
           {selectedStory ? (
             <ReaderPage key={selectedStory.id} story={selectedStory} mode={readerMode} language={language} text={text} suspendAudio={section === 'settings'} onBack={() => setSelectedStory(null)} />
           ) : contentSection === 'home' ? (

@@ -28,6 +28,7 @@ The prototype includes a bilingual sample-story reader presented as a responsive
 - **Audio fallback:** disable Listen when audio is unavailable; keep Read available. One sample is intentionally unavailable to exercise this state on every device.
 - **Reader controls:** place text sizing, page navigation, and page/scroll layout selection in a collapsible reader sidebar on wide screens; adapt the toolbar above the reading area on small screens. Continuous-scroll mode uses one connected reading surface with internal page landmarks and saves the visible page.
 - **Reader presentation:** use a CSS 3D open-book spread containing story text only. Page mode shows two consecutive story pages and its arrows advance by one spread; continuous-scroll mode uses one connected surface across the spread. On wide screens, controls float at the right and expand to the right without reserving book width; on small screens, keep them above the book.
+- **Styling ownership:** migrate visual rules into Tailwind utilities in the owning page/component. Keep the global stylesheet for the Tailwind entry, reset, and shared theme tokens; remove old selectors incrementally after each migration step.
 - **Display preferences:** keep language selection in Settings only. Provide light and dark themes, default to light, and save both preferences on this device.
 - **Settings presentation:** show language and theme preferences in a compact side drawer rather than a full-page settings screen.
 - **Settings audio behavior:** pause any active narration while the settings drawer is open; the reader remains in place behind it.
@@ -72,6 +73,12 @@ The prototype includes a bilingual sample-story reader presented as a responsive
 - Increased selected-state contrast in dark mode for the reader layout buttons and category chips using white text on dark green.
 - Redesigned the reader as a responsive 3D open book with story content on both pages, spread navigation, a connected scroll surface, and a right-side floating control panel that does not resize the book; preserved narration and saved progress.
 - `npm.cmd run build` passed after the story-only spread and right-opening floating controls update.
+- Added Tailwind v4 theme mappings for shared colors, fonts, responsive breakpoints, and the `data-theme="dark"` variant; existing component styles remain in place for incremental migration. `npm.cmd run build` passed.
+- Moved app-shell, header/navigation, and footer styling into their owning JSX files with Tailwind utilities; removed their legacy selectors and responsive/dark overrides. `npm.cmd run build` passed.
+- Moved EmptyPage, LanguageSwitcher, and AudioAvailabilityBadge styling into their owning JSX files and removed their legacy selectors, including dark-theme and responsive overrides. `npm.cmd run build` and `git diff --check` passed.
+- Migrated ReaderPage's book spread, right-floating controls, responsive layout, progress states, and dark-theme treatment to Tailwind utilities in `ReaderPage.jsx`; removed its page-specific selectors from `styles.css`. `npm.cmd run build` and `git diff --check` passed.
+- Migrated the narration controls and Read/Listen dialog, including their responsive, dark-theme, and voice-unavailable states, to Tailwind utilities in their components; removed their legacy selectors. `npm.cmd run build` and `git diff --check` passed.
+- Migrated Home, Library, Progress, My Stories, Settings, and the reusable story/progress/recommendation cards to component-owned Tailwind utilities. The shared stylesheet now holds only the Tailwind entry, shared tokens, base reset, reduced-motion rule, and light/dark theme variables. `npm.cmd run build` and `git diff --check` passed.
 - `npm.cmd run build` passed after the latest audio, content, reader-scroll, and Settings drawer updates.
 - Pushed commit `004d9be` (`Add local story audio and reader controls`) to `origin/main`; the production build passed and no type-check script is configured. Vercel deployment remains deferred pending MVP manual review.
 - Added current-word highlighting during local narration, with English/Burmese word segmentation and a theme-aware marker. Browsers without word-boundary events leave the story text unmarked.
@@ -88,6 +95,7 @@ The prototype includes a bilingual sample-story reader presented as a responsive
 
 ## Open decisions and manual follow-up
 
+- Manual UI review remains pending: the local preview started at `127.0.0.1:5174` because port 5173 was occupied, but the browser access host is unavailable and native Chrome control timed out. Resume the reader, theme, responsive layout, Settings drawer, disabled Listen, and scroll-progress checks when preview control is available.
 - A separate Android package is optional and undecided; Play Store distribution is not planned.
 - Once the MVP is complete, import `Ymag06/offline-stories-library` into Vercel, use `main` as the production branch, confirm the Vite build command is `npm run build` with output directory `dist`, and create the first deployment.
 - Verify first-visit caching and offline relaunch in a browser after the site is live.

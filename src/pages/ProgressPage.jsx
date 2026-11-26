@@ -30,7 +30,7 @@ export default function ProgressPage({ text, language, onContinueStory }) {
   }, [])
 
   if (status === 'loading') {
-    return <p className="progress-loading" role="status">{text.progressLoading}</p>
+    return <p className="grid min-h-[350px] place-content-center text-center text-muted" role="status">{text.progressLoading}</p>
   }
 
   if (status === 'error') {
@@ -42,11 +42,11 @@ export default function ProgressPage({ text, language, onContinueStory }) {
   }
 
   return (
-    <section className="progress-page">
-      <div className="section-heading">
-        <div><span className="eyebrow">{text.brand}</span><h1>{text.progressTitle}</h1><p>{text.progressText}</p></div>
+    <section className="pt-2">
+      <div className="mb-5 flex items-end justify-between gap-5 max-compact:items-start max-compact:flex-col max-compact:gap-3">
+        <div><span className="inline-flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.12em] text-[#577065] dark:text-[#b7cbbd]">{text.brand}</span><h1 className="mt-[6px] mb-1 font-story text-[clamp(26px,3vw,36px)] font-medium leading-[1.2] tracking-[-0.035em] text-green-dark max-compact:text-[28px]">{text.progressTitle}</h1><p className="m-0 text-[13px] text-muted max-compact:text-xs">{text.progressText}</p></div>
       </div>
-      <div className="progress-list">
+      <div className="grid gap-[13px]">
         {records.map(({ record, story }) => (
           <ReadingProgressCard
             key={record.storyId}
