@@ -8,6 +8,8 @@ import {
 import { wordRangeAtCharacter } from '../lib/textSegmentation.js'
 
 const SEEK_SECONDS = 5
+const speechButtonClasses = 'inline-flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-xl border-0 bg-green px-[14px] text-xs font-[750] text-white'
+const seekButtonClasses = 'inline-flex min-h-[38px] cursor-pointer items-center justify-center gap-1 whitespace-nowrap rounded-[10px] border border-[rgba(28,48,43,0.12)] bg-white px-[9px] text-[11px] font-[750] text-green-dark disabled:cursor-default disabled:opacity-[0.45] dark:border-line dark:bg-[#18211c] dark:text-ink dark:disabled:text-[#b6c5ba]'
 
 function formatTime(seconds) {
   const bounded = Math.max(0, Math.floor(seconds || 0))
@@ -198,11 +200,11 @@ export default function SpeechControls({ storyText, language, labels, onPageComp
   const unavailable = status === 'unavailable' || status === 'error'
 
   return (
-    <section className="speech-controls" aria-label={labels.listenControls}>
-      <div className="speech-status-row">
+    <section className="mt-4 mb-[5px] rounded-[17px] border border-[rgba(28,48,43,0.09)] bg-[#eef3eb] px-[18px] pt-4 pb-3 dark:border-line dark:bg-[#202e26] max-compact:px-3 max-compact:pt-[13px] max-compact:pb-[11px]" aria-label={labels.listenControls}>
+      <div className="flex items-center justify-between gap-3">
         <div>
-          <span className="speech-controls-eyebrow">{labels.listenLabel}</span>
-          <p className="speech-status" role="status" aria-live="polite">
+          <span className="text-[10px] font-extrabold uppercase tracking-[0.06em] text-[#69816e]">{labels.listenLabel}</span>
+          <p className="mt-[3px] mb-0 text-xs font-bold text-green-dark" role="status" aria-live="polite">
             {status === 'checking' ? labels.speechChecking
               : status === 'unavailable' ? labels.speechUnavailable
                 : status === 'error' ? labels.speechError
@@ -212,27 +214,28 @@ export default function SpeechControls({ storyText, language, labels, onPageComp
           </p>
         </div>
         {!unavailable && status !== 'checking' && (
-          <button className="speech-play-button" type="button" onClick={togglePlayback} aria-label={status === 'speaking' ? labels.pauseAudio : labels.playAudio}>
-            <span aria-hidden="true">{status === 'speaking' ? 'Ⅱ' : '▶'}</span>
+          <button className={`${speechButtonClasses} dark:text-[#10251a]`} type="button" onClick={togglePlayback} aria-label={status === 'speaking' ? labels.pauseAudio : labels.playAudio}>
+            <span className="text-[15px]" aria-hidden="true">{status === 'speaking' ? 'Ⅱ' : '▶'}</span>
             {status === 'speaking' ? labels.pauseAudio : labels.playAudio}
           </button>
         )}
       </div>
 
       {unavailable ? (
-        <div className="speech-fallback">
-          <p>{status === 'error' ? labels.speechErrorHelp : labels.speechUnavailableHelp}</p>
-          <button className="speech-read-instead" type="button" onClick={onReadInstead}>{labels.readInstead}</button>
+        <div className="mt-[10px] flex items-center justify-between gap-[15px] max-compact:items-stretch max-compact:flex-col max-compact:gap-[10px]">
+          <p className="m-0 max-w-[570px] text-[11px] leading-[1.55] text-[#52675a] dark:text-[#d2ddd5]">{status === 'error' ? labels.speechErrorHelp : labels.speechUnavailableHelp}</p>
+          <button className={`${speechButtonClasses} shrink-0 self-start`} type="button" onClick={onReadInstead}>{labels.readInstead}</button>
         </div>
       ) : (
         <>
-          <div className="speech-seek-row">
-            <button className="speech-seek-button" type="button" onClick={() => seekBy(-SEEK_SECONDS)} disabled={status === 'checking'} aria-label={labels.seekBackward}>
-              <span aria-hidden="true">↶</span> −5s
+          <div className="mt-3 grid grid-cols-[auto_minmax(60px,1fr)_auto] items-center gap-[10px] max-compact:grid-cols-2 max-compact:gap-[7px]">
+            <button className={seekButtonClasses} type="button" onClick={() => seekBy(-SEEK_SECONDS)} disabled={status === 'checking'} aria-label={labels.seekBackward}>
+              <span className="text-[15px]" aria-hidden="true">↶</span> −5s
             </button>
-            <div className="speech-timeline">
+            <div className="min-w-0 max-compact:col-span-full max-compact:row-start-1">
               <label className="sr-only" htmlFor="speech-position">{labels.positionSlider}</label>
               <input
+                className="m-0 block min-h-7 w-full cursor-pointer accent-[#548462] disabled:cursor-wait"
                 id="speech-position"
                 type="range"
                 min="0"
@@ -245,16 +248,16 @@ export default function SpeechControls({ storyText, language, labels, onPageComp
                 onKeyUp={handleSeekKeyUp}
                 onBlur={() => { if (seekDraftRef.current !== null) commitSeek(seekDraftRef.current) }}
               />
-              <div className="speech-time-readout" aria-live="off">
+              <div className="flex justify-between text-[10px] tabular-nums text-[#63796a] dark:text-[#b6c5ba]" aria-live="off">
                 <span>~{formatTime(seekDraft ?? position)}</span>
                 <span>~{formatTime(timing.duration)}</span>
               </div>
             </div>
-            <button className="speech-seek-button" type="button" onClick={() => seekBy(SEEK_SECONDS)} disabled={status === 'checking'} aria-label={labels.seekForward}>
-              +5s <span aria-hidden="true">↷</span>
+            <button className={seekButtonClasses} type="button" onClick={() => seekBy(SEEK_SECONDS)} disabled={status === 'checking'} aria-label={labels.seekForward}>
+              +5s <span className="text-[15px]" aria-hidden="true">↷</span>
             </button>
           </div>
-          <p className="speech-approximate-note">{labels.approximatePosition}</p>
+          <p className="mt-[7px] mb-0 text-[10px] leading-[1.45] text-[#75857a] dark:text-[#b6c5ba]">{labels.approximatePosition}</p>
           <span className="sr-only">{voice?.name ? `${labels.localVoice}: ${voice.name}` : ''}</span>
         </>
       )}
