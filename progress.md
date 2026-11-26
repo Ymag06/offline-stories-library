@@ -1,10 +1,10 @@
 # Project progress
 
-Last updated: 2026-11-25
+Last updated: 2026-11-26
 
 ## Current status
 
-The prototype includes a bilingual sample-story reader, guided on-device story writing, recommended categories, recently opened stories, local text-to-speech with current-word highlighting, responsive reader controls, connected scroll/page layouts, audio-availability states, and saved light/dark themes in a settings drawer. The production build passes; visual and device voice behavior still need manual verification. Vercel is selected for production hosting, but deployment is deferred until the agreed MVP features are complete.
+The prototype includes a bilingual sample-story reader presented as a responsive 3D open book, guided on-device story writing, recommended categories, recently opened stories, local text-to-speech with current-word highlighting, responsive reader controls, connected scroll/page layouts, audio-availability states, and saved light/dark themes in a settings drawer. Visual and device voice behavior still need manual verification. Vercel is selected for production hosting, but deployment is deferred until the agreed MVP features are complete.
 
 ## Decisions
 
@@ -27,6 +27,7 @@ The prototype includes a bilingual sample-story reader, guided on-device story w
 - **Audio availability labels:** story cards indicate whether the device has a matching locally installed offline TTS voice, not whether there is a pre-recorded audio file.
 - **Audio fallback:** disable Listen when audio is unavailable; keep Read available. One sample is intentionally unavailable to exercise this state on every device.
 - **Reader controls:** place text sizing, page navigation, and page/scroll layout selection in a collapsible reader sidebar on wide screens; adapt the toolbar above the reading area on small screens. Continuous-scroll mode uses one connected reading surface with internal page landmarks and saves the visible page.
+- **Reader presentation:** use a CSS 3D open-book spread containing story text only. Page mode shows two consecutive story pages and its arrows advance by one spread; continuous-scroll mode uses one connected surface across the spread. On wide screens, controls float at the right and expand to the right without reserving book width; on small screens, keep them above the book.
 - **Display preferences:** keep language selection in Settings only. Provide light and dark themes, default to light, and save both preferences on this device.
 - **Settings presentation:** show language and theme preferences in a compact side drawer rather than a full-page settings screen.
 - **Settings audio behavior:** pause any active narration while the settings drawer is open; the reader remains in place behind it.
@@ -69,6 +70,8 @@ The prototype includes a bilingual sample-story reader, guided on-device story w
 - Changed Settings into a compact slide-in side drawer and updated selected-state colors for layout/category controls.
 - Simplified visible audio messages to plain language and pause narration while the Settings drawer is open.
 - Increased selected-state contrast in dark mode for the reader layout buttons and category chips using white text on dark green.
+- Redesigned the reader as a responsive 3D open book with story content on both pages, spread navigation, a connected scroll surface, and a right-side floating control panel that does not resize the book; preserved narration and saved progress.
+- `npm.cmd run build` passed after the story-only spread and right-opening floating controls update.
 - `npm.cmd run build` passed after the latest audio, content, reader-scroll, and Settings drawer updates.
 - Pushed commit `004d9be` (`Add local story audio and reader controls`) to `origin/main`; the production build passed and no type-check script is configured. Vercel deployment remains deferred pending MVP manual review.
 - Added current-word highlighting during local narration, with English/Burmese word segmentation and a theme-aware marker. Browsers without word-boundary events leave the story text unmarked.

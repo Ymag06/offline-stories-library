@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import SpeechControls from '../components/SpeechControls.jsx'
 import { getReadingProgress, saveReadingProgress } from '../lib/readingProgress.js'
-import { getStoryDescription, getStoryPages, getStoryTitle } from '../lib/storyContent.js'
+import { getStoryPages, getStoryTitle } from '../lib/storyContent.js'
 
 const MIN_TEXT_SIZE = 1
 const MAX_TEXT_SIZE = 1.5
@@ -47,7 +47,8 @@ export default function ReaderPage({ story, mode, language, text, onBack, suspen
         const savedPage = Number.isInteger(record?.lastPosition) ? record.lastPosition : 0
         const restoredPage = Math.min(Math.max(savedPage, 0), Math.max(totalPages - 1, 0))
         setCurrentPage(restoredPage)
-        setCompleted(Boolean(record?.completed || (mode === 'read' && totalPages > 0 && restoredPage === totalPages - 1)))
+        const restoredSpreadEnd = Math.min(Math.floor(restoredPage / 2) * 2 + 1, totalPages - 1)
+        setCompleted(Boolean(record?.completed || (mode === 'read' && totalPages > 0 && restoredSpreadEnd === totalPages - 1)))
         setProgressLoaded(true)
       })
       .catch(() => {
@@ -124,6 +125,16 @@ export default function ReaderPage({ story, mode, language, text, onBack, suspen
     }
   }
 
+  const goToSpread = (direction) => {
+    const spreadStart = Math.floor(currentPage / 2) * 2
+    const lastSpreadStart = Math.floor((totalPages - 1) / 2) * 2
+    const nextSpreadStart = Math.min(Math.max(spreadStart + direction * 2, 0), lastSpreadStart)
+    if (nextSpreadStart === spreadStart) return
+    setActiveWord(null)
+    setCurrentPage(nextSpreadStart)
+    if (nextSpreadStart + 1 >= totalPages - 1) setCompleted(true)
+  }
+
   const handleAudioPageComplete = useCallback(() => {
     if (currentPage < totalPages - 1) {
       const nextPage = Math.min(currentPage + 1, totalPages - 1)
@@ -147,7 +158,14 @@ export default function ReaderPage({ story, mode, language, text, onBack, suspen
   )
 
   const pageNumber = currentPage + 1
-  const percent = totalPages ? Math.round((pageNumber / totalPages) * 100) : 0
+  const spreadStartPage = Math.floor(currentPage / 2) * 2
+  const spreadEndPage = Math.min(spreadStartPage + 1, totalPages - 1)
+  const spreadLabel = spreadEndPage > spreadStartPage
+    ? `${text.page} ${spreadStartPage + 1}–${spreadEndPage + 1} ${text.of} ${totalPages}`
+    : `${text.page} ${spreadStartPage + 1} ${text.of} ${totalPages}`
+  const lastSpreadStart = Math.floor((totalPages - 1) / 2) * 2
+  const progressPageNumber = layoutMode === 'pages' && activeMode === 'read' ? spreadEndPage + 1 : pageNumber
+  const percent = totalPages ? Math.round((progressPageNumber / totalPages) * 100) : 0
 
   if (!totalPages) {
     return (
@@ -173,42 +191,43 @@ export default function ReaderPage({ story, mode, language, text, onBack, suspen
         <button className="back-button" type="button" onClick={onBack}>← {text.backToStories}</button>
         <span className="eyebrow">{story.userCreated ? text.writtenByYou : text.sample}</span>
       </div>
-      <header className="reader-heading">
-        <div className={`reader-cover art-${story.art}`} aria-hidden="true"><span>{story.icon}</span></div>
-        <div>
-          <span className="category-label">{text.readerLabel}</span>
-          <h1 id="reader-title">{getStoryTitle(story, language)}</h1>
-          <p>{getStoryDescription(story, language)}</p>
-        </div>
-      </header>
-
+      <h1 id="reader-title" className="sr-only">{getStoryTitle(story, language)}</h1>
       <div className={`reader-workspace${controlsCollapsed ? ' reader-workspace-collapsed' : ''}`}>
         <div className="reader-reading-column">
-          {layoutMode === 'pages' ? (
-            <article ref={(element) => { pageElementsRef.current[currentPage] = element }} className="reader-paper">
-              <div className="reader-paper-top"><span>{text.brand}</span><span>{String(pageNumber).padStart(2, '0')}</span></div>
-              <p className="reader-story-text" style={{ fontSize: `${textSize}rem` }}>{textForPage(pages[currentPage], currentPage)}</p>
-              {completed && currentPage === totalPages - 1 && <p className="reader-complete" role="status">✦ {text.readerComplete}</p>}
-            </article>
-          ) : (
-            <article className="reader-paper reader-scroll-paper" aria-label={getStoryTitle(story, language)}>
-              <div className="reader-paper-top"><span>{text.brand}</span><span>{pageNumber} / {totalPages}</span></div>
-              <div className="reader-scroll-content">
-                {pages.map((pageText, index) => (
-                  <section
-                    ref={(element) => { pageElementsRef.current[index] = element }}
-                    className="reader-scroll-segment"
-                    key={`${story.id}-page-${index}`}
-                    aria-label={`${text.page} ${index + 1} ${text.of} ${totalPages}`}
-                    aria-current={index === currentPage ? 'true' : undefined}
-                  >
-                    <p className="reader-story-text" style={{ fontSize: `${textSize}rem` }}>{textForPage(pageText, index)}</p>
-                  </section>
-                ))}
-              </div>
-              {completed && currentPage === totalPages - 1 && <p className="reader-complete" role="status">✦ {text.readerComplete}</p>}
-            </article>
-          )}
+          <div className="reader-book-stage">
+            <div className="reader-book">
+              {layoutMode === 'pages' ? (
+                <>
+                  <article className="reader-paper reader-book-page reader-book-left-page" aria-label={`${text.page} ${spreadStartPage + 1} ${text.of} ${totalPages}`}>
+                    <p className="reader-story-text" style={{ fontSize: `${textSize}rem` }}>{textForPage(pages[spreadStartPage], spreadStartPage)}</p>
+                  </article>
+                  <div className="reader-book-spine" aria-hidden="true" />
+                  <article className="reader-paper reader-book-page reader-book-right-page" aria-label={spreadStartPage + 1 < totalPages ? `${text.page} ${spreadStartPage + 2} ${text.of} ${totalPages}` : undefined} aria-hidden={spreadStartPage + 1 >= totalPages}>
+                    {spreadStartPage + 1 < totalPages ? (
+                      <p className="reader-story-text" style={{ fontSize: `${textSize}rem` }}>{textForPage(pages[spreadStartPage + 1], spreadStartPage + 1)}</p>
+                    ) : null}
+                  </article>
+                </>
+              ) : (
+                <article className="reader-paper reader-book-page reader-scroll-paper reader-book-scroll-surface" aria-label={getStoryTitle(story, language)}>
+                  <div className="reader-scroll-content">
+                    {pages.map((pageText, index) => (
+                      <section
+                        ref={(element) => { pageElementsRef.current[index] = element }}
+                        className="reader-scroll-segment"
+                        key={`${story.id}-page-${index}`}
+                        aria-label={`${text.page} ${index + 1} ${text.of} ${totalPages}`}
+                        aria-current={index === currentPage ? 'true' : undefined}
+                      >
+                        <p className="reader-story-text" style={{ fontSize: `${textSize}rem` }}>{textForPage(pageText, index)}</p>
+                      </section>
+                    ))}
+                  </div>
+                </article>
+              )}
+            </div>
+          </div>
+          {completed && (layoutMode === 'pages' ? spreadEndPage === totalPages - 1 : currentPage === totalPages - 1) && <p className="reader-complete" role="status">✦ {text.readerComplete}</p>}
 
           {activeMode === 'listen' && (
             <SpeechControls
@@ -236,7 +255,7 @@ export default function ReaderPage({ story, mode, language, text, onBack, suspen
             aria-label={controlsCollapsed ? text.expandControls : text.minimizeControls}
             aria-expanded={!controlsCollapsed}
           >
-            <span aria-hidden="true">{controlsCollapsed ? '‹' : '›'}</span>
+            <span aria-hidden="true">{controlsCollapsed ? '›' : '‹'}</span>
             {!controlsCollapsed && <span>{text.minimizeControls}</span>}
           </button>
           {!controlsCollapsed && (
@@ -256,10 +275,10 @@ export default function ReaderPage({ story, mode, language, text, onBack, suspen
                 </div>
               </div>
               <div className="reader-sidebar-group reader-sidebar-page-nav">
-                <span className="reader-sidebar-label" aria-live="polite">{text.page} {pageNumber} {text.of} {totalPages}</span>
+                <span className="reader-sidebar-label" aria-live="polite">{layoutMode === 'pages' ? spreadLabel : `${text.page} ${pageNumber} ${text.of} ${totalPages}`}</span>
                 <div className="reader-sidebar-navigation">
-                  <button type="button" onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 0} aria-label={text.previousPage}>←</button>
-                  <button type="button" onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages - 1} aria-label={text.nextPage}>→</button>
+                  <button type="button" onClick={() => layoutMode === 'pages' ? goToSpread(-1) : goToPage(currentPage - 1)} disabled={layoutMode === 'pages' ? spreadStartPage === 0 : currentPage === 0} aria-label={text.previousPage}>←</button>
+                  <button type="button" onClick={() => layoutMode === 'pages' ? goToSpread(1) : goToPage(currentPage + 1)} disabled={layoutMode === 'pages' ? spreadStartPage >= lastSpreadStart : currentPage === totalPages - 1} aria-label={text.nextPage}>→</button>
                 </div>
               </div>
             </>
