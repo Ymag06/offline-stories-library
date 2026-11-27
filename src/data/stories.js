@@ -78,6 +78,10 @@ export const stories = [
       en: '/stories/hare-and-tortoise/audio-en.mp3',
       my: '/stories/hare-and-tortoise/audio-my.mp3',
     },
+    timingFiles: {
+      en: '/stories/hare-and-tortoise/timing-en.json',
+      my: null,
+    },
   },
 ]
 

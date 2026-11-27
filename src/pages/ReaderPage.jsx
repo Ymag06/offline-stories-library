@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import RecordedAudioControls from '../components/RecordedAudioControls.jsx'
 import SpeechControls from '../components/SpeechControls.jsx'
 import { getReadingProgress, saveReadingProgress } from '../lib/readingProgress.js'
+import { findTimingSegmentAtTime, mapTimingSegmentsToText } from '../lib/readAlongTiming.js'
 import { getStoryPageImage, getStoryPages, getStoryTitle } from '../lib/storyContent.js'
 
 const MIN_TEXT_SIZE = 1
@@ -34,11 +35,78 @@ function renderStoryText(content, activeWord) {
   )
 }
 
+function renderTimedStoryPage(pageText, pageStart, segments, activeSegmentIndex, onSeek, seekLabel, pageIndex) {
+  const pageEnd = pageStart + pageText.length
+  const fragments = []
+  let cursor = 0
+
+  segments.forEach((segment, segmentIndex) => {
+    if (segment.textEnd <= pageStart || segment.textStart >= pageEnd) return
+
+    const localStart = Math.max(segment.textStart, pageStart) - pageStart
+    const localEnd = Math.min(segment.textEnd, pageEnd) - pageStart
+    if (localStart < cursor) return
+    if (localStart > cursor) fragments.push(pageText.slice(cursor, localStart))
+
+    const text = pageText.slice(localStart, localEnd)
+    const seek = () => onSeek(segment, pageIndex)
+    const isInHighlightWindow = activeSegmentIndex >= 0
+      && segmentIndex >= activeSegmentIndex
+      && segmentIndex < activeSegmentIndex + 3
+    const isWindowStart = isInHighlightWindow && segmentIndex === activeSegmentIndex
+    const isWindowEnd = isInHighlightWindow && segmentIndex === Math.min(activeSegmentIndex + 2, segments.length - 1)
+    const highlightCorners = !isInHighlightWindow
+      ? 'rounded-[0.16em]'
+      : isWindowStart && isWindowEnd
+        ? 'rounded-[0.16em]'
+        : isWindowStart
+          ? 'rounded-l-[0.16em] rounded-r-none'
+          : isWindowEnd
+            ? 'rounded-l-none rounded-r-[0.16em]'
+            : 'rounded-none'
+
+    fragments.push(
+      <span
+        key={`segment-${segmentIndex}-${pageIndex}`}
+        className="cursor-pointer rounded-[0.15em] underline decoration-transparent underline-offset-2 hover:decoration-current focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        role="button"
+        tabIndex={0}
+        aria-label={`${seekLabel}: ${text}`}
+        onClick={seek}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault()
+            seek()
+          }
+        }}
+      >
+        <mark className={`-mx-[0.14em] px-[0.14em] [box-decoration-break:clone] [-webkit-box-decoration-break:clone] transition-colors duration-800 ease-in-out motion-reduce:transition-none ${highlightCorners} ${isInHighlightWindow ? 'bg-[#f4d574] text-[#27311f] dark:bg-[#f2cf5e] dark:text-[#202819]' : 'bg-transparent text-inherit'}`}>
+          {text}
+        </mark>
+      </span>,
+    )
+    cursor = localEnd
+  })
+
+  if (cursor < pageText.length) fragments.push(pageText.slice(cursor))
+  return fragments.length ? fragments : pageText
+}
+
 export default function ReaderPage({ story, mode, language, text, onBack, suspendAudio = false }) {
-  const pages = getStoryPages(story, language)
+  const pages = useMemo(() => getStoryPages(story, language), [language, story])
   const totalPages = pages.length
   const audioLanguage = story.userCreated ? (story.language || language) : language
   const recordedAudio = story.audioFiles?.[audioLanguage]
+  const timingUrl = story.timingFiles?.[audioLanguage]
+  const fullStoryText = useMemo(() => pages.join('\n\n'), [pages])
+  const pageOffsets = useMemo(() => {
+    let offset = 0
+    return pages.map((page) => {
+      const pageStart = offset
+      offset += page.length + 2
+      return pageStart
+    })
+  }, [pages])
   const [currentPage, setCurrentPage] = useState(0)
   const [textSize, setTextSize] = useState(1.2)
   const [completed, setCompleted] = useState(false)
@@ -46,11 +114,52 @@ export default function ReaderPage({ story, mode, language, text, onBack, suspen
   const [layoutMode, setLayoutMode] = useState('pages')
   const [controlsCollapsed, setControlsCollapsed] = useState(false)
   const [progressLoaded, setProgressLoaded] = useState(false)
+  const [loadedProgressKey, setLoadedProgressKey] = useState('')
   const [storageError, setStorageError] = useState(false)
   const [activeWord, setActiveWord] = useState(null)
+  const [timingSegments, setTimingSegments] = useState([])
+  const [timingStatus, setTimingStatus] = useState('missing')
+  const [activeTimingSegmentIndex, setActiveTimingSegmentIndex] = useState(-1)
+  const [seekRequest, setSeekRequest] = useState(null)
   const [audioPosition, setAudioPosition] = useState(0)
   const [turningSheet, setTurningSheet] = useState(null)
   const pageElementsRef = useRef([])
+  const progressKey = `${story.id}:${audioLanguage}`
+
+  useEffect(() => {
+    let active = true
+    const controller = new AbortController()
+    setTimingSegments([])
+    setActiveTimingSegmentIndex(-1)
+    setSeekRequest(null)
+
+    if (!timingUrl || !timingUrl.startsWith('/')) {
+      setTimingStatus(timingUrl ? 'error' : 'missing')
+      return () => { active = false; controller.abort() }
+    }
+
+    setTimingStatus('loading')
+    fetch(timingUrl, { signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) throw new Error('Story timing could not be loaded.')
+        return response.json()
+      })
+      .then((timingData) => {
+        const mappedSegments = mapTimingSegmentsToText(fullStoryText, timingData)
+        if (!active) return
+        setTimingSegments(mappedSegments)
+        setTimingStatus(mappedSegments.length ? 'ready' : 'missing')
+      })
+      .catch((error) => {
+        if (!active || error.name === 'AbortError') return
+        setTimingStatus('error')
+      })
+
+    return () => {
+      active = false
+      controller.abort()
+    }
+  }, [fullStoryText, story.id, timingUrl])
 
   useEffect(() => {
     let active = true
@@ -66,16 +175,19 @@ export default function ReaderPage({ story, mode, language, text, onBack, suspen
         setCurrentPage(restoredPage)
         setCompleted(Boolean(record?.completed && savedPage >= totalPages - 1))
         setAudioPosition(record?.audioLanguage === audioLanguage && Number.isFinite(record?.audioPosition) ? record.audioPosition : 0)
+        setLoadedProgressKey(progressKey)
         setProgressLoaded(true)
       })
       .catch(() => {
         if (!active) return
         setStorageError(true)
+        setAudioPosition(0)
+        setLoadedProgressKey(progressKey)
         setProgressLoaded(true)
       })
 
     return () => { active = false }
-  }, [audioLanguage, story.id, totalPages])
+  }, [audioLanguage, progressKey, story.id, totalPages])
 
   useEffect(() => { setActiveMode(mode) }, [mode, story.id])
 
@@ -115,7 +227,7 @@ export default function ReaderPage({ story, mode, language, text, onBack, suspen
   }, [layoutMode])
 
   useEffect(() => {
-    if (!progressLoaded || totalPages === 0) return undefined
+    if (!progressLoaded || loadedProgressKey !== progressKey || totalPages === 0) return undefined
     let active = true
     const record = {
       storyId: story.id,
@@ -132,7 +244,7 @@ export default function ReaderPage({ story, mode, language, text, onBack, suspen
       .catch(() => { if (active) setStorageError(true) })
 
     return () => { active = false }
-  }, [audioLanguage, audioPosition, completed, currentPage, progressLoaded, recordedAudio, story.id, totalPages])
+  }, [audioLanguage, audioPosition, completed, currentPage, loadedProgressKey, progressKey, progressLoaded, recordedAudio, story.id, totalPages])
 
   const goToPage = (nextPage) => {
     if (turningSheet) return
@@ -196,14 +308,56 @@ export default function ReaderPage({ story, mode, language, text, onBack, suspen
     setAudioPosition(nextPosition)
   }, [])
 
+  const handleRecordedAudioTime = useCallback((seconds) => {
+    if (timingStatus !== 'ready') {
+      setActiveTimingSegmentIndex(-1)
+      return
+    }
+
+    const nextSegmentIndex = findTimingSegmentAtTime(timingSegments, seconds)
+    setActiveTimingSegmentIndex((index) => index === nextSegmentIndex ? index : nextSegmentIndex)
+    const segment = timingSegments[nextSegmentIndex]
+    if (!segment) return
+
+    const pageIndex = pageOffsets.findIndex((pageStart, index) => {
+      const pageEnd = pageStart + pages[index].length
+      return segment.textStart >= pageStart && segment.textStart < pageEnd
+    })
+    if (pageIndex < 0 || pageIndex === currentPage) return
+
+    setCurrentPage(pageIndex)
+    if (layoutMode === 'scroll') {
+      window.requestAnimationFrame(() => pageElementsRef.current[pageIndex]?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
+    }
+  }, [currentPage, layoutMode, pageOffsets, pages, timingSegments, timingStatus])
+
+  const seekToSegment = useCallback((segment, pageIndex) => {
+    setCurrentPage(pageIndex)
+    setActiveTimingSegmentIndex(timingSegments.indexOf(segment))
+    setSeekRequest({ seconds: segment.start, requestedAt: Date.now() })
+    if (layoutMode === 'scroll') {
+      window.requestAnimationFrame(() => pageElementsRef.current[pageIndex]?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
+    }
+  }, [layoutMode, timingSegments])
+
   const handleWordBoundary = useCallback((wordRange) => {
     setActiveWord(wordRange ? { ...wordRange, pageIndex: currentPage } : null)
   }, [currentPage])
 
-  const textForPage = (pageText, pageIndex) => renderStoryText(
-    pageText,
-    activeMode === 'readAlong' && activeWord?.pageIndex === pageIndex ? activeWord : null,
-  )
+  const textForPage = (pageText, pageIndex) => {
+    if (activeMode === 'readAlong' && recordedAudio) {
+      return renderTimedStoryPage(
+        pageText,
+        pageOffsets[pageIndex] || 0,
+        timingSegments,
+        activeTimingSegmentIndex,
+        seekToSegment,
+        text.seekToSegment,
+        pageIndex,
+      )
+    }
+    return renderStoryText(pageText, activeMode === 'readAlong' && activeWord?.pageIndex === pageIndex ? activeWord : null)
+  }
 
   const renderPageContent = (pageText, pageIndex) => {
     const pageImage = getStoryPageImage(story, pageIndex)
@@ -224,6 +378,13 @@ export default function ReaderPage({ story, mode, language, text, onBack, suspen
   const lastSpreadStart = Math.floor((totalPages - 1) / 2) * 2
   const progressPageNumber = layoutMode === 'pages' && activeMode === 'read' ? spreadEndPage + 1 : pageNumber
   const percent = totalPages ? Math.round((progressPageNumber / totalPages) * 100) : 0
+  const readAlongTimingNotice = timingStatus === 'loading'
+    ? text.readAlongTimingLoading
+    : timingStatus === 'error'
+      ? text.readAlongTimingInvalid
+      : timingStatus !== 'ready'
+        ? text.readAlongTimingUnavailable
+        : ''
 
   if (!totalPages) {
     return (
@@ -234,7 +395,7 @@ export default function ReaderPage({ story, mode, language, text, onBack, suspen
     )
   }
 
-  if (!progressLoaded) {
+  if (!progressLoaded || loadedProgressKey !== progressKey) {
     return (
       <section className={readerPageClasses}>
         <button className={backButtonClasses} type="button" onClick={onBack}>← {text.backToStories}</button>
@@ -325,7 +486,21 @@ export default function ReaderPage({ story, mode, language, text, onBack, suspen
           {completed && (layoutMode === 'pages' ? spreadEndPage === totalPages - 1 : currentPage === totalPages - 1) && <p className="mt-[25px] mb-0 flex items-center gap-2 text-sm font-extrabold text-[#538061] dark:text-[#a6d9b0]" role="status">✦ {text.readerComplete}</p>}
 
           {(activeMode === 'listen' || activeMode === 'readAlong') && (
-            activeMode === 'listen' && recordedAudio ? (
+            activeMode === 'readAlong' && recordedAudio ? (
+              <RecordedAudioControls
+                key={`${story.id}-${audioLanguage}-${activeMode}`}
+                src={recordedAudio}
+                labels={text}
+                initialPosition={audioPosition}
+                onPositionChange={handleRecordedAudioPosition}
+                onTimeUpdate={handleRecordedAudioTime}
+                onComplete={handleRecordedAudioComplete}
+                onReadInstead={() => { setActiveWord(null); setActiveMode('read') }}
+                suspendAudio={suspendAudio}
+                seekRequest={seekRequest}
+                timingNotice={readAlongTimingNotice}
+              />
+            ) : activeMode === 'listen' && recordedAudio ? (
               <RecordedAudioControls
                 key={`${story.id}-${audioLanguage}-${activeMode}`}
                 src={recordedAudio}
@@ -336,7 +511,7 @@ export default function ReaderPage({ story, mode, language, text, onBack, suspen
                 onReadInstead={() => { setActiveWord(null); setActiveMode('read') }}
                 suspendAudio={suspendAudio}
               />
-            ) : (
+            ) : activeMode === 'listen' ? (
               <SpeechControls
                 key={`${story.id}-${currentPage}-${language}-${activeMode}`}
                 storyText={pages[currentPage]}
@@ -347,6 +522,8 @@ export default function ReaderPage({ story, mode, language, text, onBack, suspen
                 onReadInstead={() => { setActiveWord(null); setActiveMode('read') }}
                 suspendAudio={suspendAudio}
               />
+            ) : (
+              <p className="mt-4 rounded-xl bg-soft-surface px-4 py-3 text-sm text-muted" role="status">{text.storyReadAlongUnavailableHelp}</p>
             )
           )}
 

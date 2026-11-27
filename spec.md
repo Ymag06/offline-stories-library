@@ -107,11 +107,13 @@ Requirements:
 - In continuous-scroll mode, show the story in one connected reading surface, not separate page cards. Preserve internal page landmarks for progress tracking.
 - Remember the last reading position.
 - Allow users to resume reading.
-- When a story is opened, let the reader choose Read, Read and listen along, or Listen; recommend Read because offline speech voices depend on the device.
-- Listen with a bundled local recording when available, or the browser's locally installed speech voice otherwise. Do not send story text to a service or require a network connection.
+- When a story is opened, let the reader choose Read, Read and listen along, or Listen; recommend Read because audio depends on selected-language content and device voice availability.
+- Read and listen along requires prerecorded narration bundled for the selected story language. Do not use browser text-to-speech for this mode. If no recording is available for that language, disable Read and listen along and keep normal reading available.
+- Listen uses a bundled local recording when available, or the browser's locally installed speech voice otherwise. Do not send story text to a service or require a network connection.
 - If no installed offline voice matching the story language is available, explain this and offer Read instead.
-- Listening controls must support play/pause and backward/forward seeking with a seek bar and short skip buttons. For speech synthesis, clearly label time and position as approximate because it does not provide a consistent audio timeline. For recordings, use the real audio timeline and save the playback position locally.
-- In Read and listen along mode, use local browser speech and highlight the current word using word-boundary events. Do not show an inaccurate approximation when boundaries are unavailable. Listen mode uses the bundled recording when present.
+- Listening controls must support play/pause/resume, seeking, and playback speed, without a separate Stop button. For speech synthesis, clearly label time and position as approximate because it does not provide a consistent audio timeline. For recordings, show actual current time and duration and save the playback position locally.
+- In Read and listen along mode, highlight manually timed word-level or phrase-level text segments from the matching recording. Keep separate timing data for English and Burmese. Burmese phrases must not rely on whitespace-based word segmentation. Seeking updates the active highlight; activating a segment seeks to its start and plays. If timings are missing or invalid, keep recorded playback available but clearly explain that text highlighting is not prepared, and never invent timestamps for a real story.
+- Match timing segments against the exact displayed story text, preserving punctuation. Store timing JSON beside the local story assets and precache it with the matching recording.
 - Advance through story pages during listening and save page-level reading progress so the user can resume at the saved page.
 - Provide a simple interface suitable for children.
 

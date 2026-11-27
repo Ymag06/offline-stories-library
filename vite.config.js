@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import { stories } from './src/data/stories.js'
 
 function offlineAppShell() {
   return {
@@ -10,18 +11,18 @@ function offlineAppShell() {
       const builtFiles = Object.keys(bundle)
         .filter((fileName) => !fileName.endsWith('.map'))
         .map((fileName) => `/${fileName}`)
-      const hareAndTortoiseAssets = [
-        '/stories/hare-and-tortoise/cover.png',
-        ...Array.from({ length: 5 }, (_, index) => `/stories/hare-and-tortoise/page-${index + 1}.png`),
-        '/stories/hare-and-tortoise/audio-en.mp3',
-        '/stories/hare-and-tortoise/audio-my.mp3',
-      ]
+      const storyAssets = stories.flatMap((story) => [
+        story.coverImage,
+        ...(story.pageImages || []),
+        ...Object.values(story.audioFiles || {}),
+        ...Object.values(story.timingFiles || {}),
+      ]).filter((asset) => typeof asset === 'string' && asset.startsWith('/'))
       const precache = [...new Set([
         '/',
         '/index.html',
         '/manifest.webmanifest',
         '/storybook.svg',
-        ...hareAndTortoiseAssets,
+        ...storyAssets,
         ...builtFiles,
       ])]
       const cacheName = `story-library-${Date.now()}`

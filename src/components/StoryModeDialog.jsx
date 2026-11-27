@@ -5,7 +5,7 @@ import { waitForLocalVoice } from '../lib/speechPlayback.js'
 export default function StoryModeDialog({ story, language, text, onChoose, onCancel }) {
   const readButtonRef = useRef(null)
   const [audioAvailability, setAudioAvailability] = useState('checking')
-  const [voiceAvailability, setVoiceAvailability] = useState('checking')
+  const [recordedAvailability, setRecordedAvailability] = useState('checking')
 
   const voiceLanguage = story.userCreated ? (story.language || language) : language
 
@@ -14,15 +14,14 @@ export default function StoryModeDialog({ story, language, text, onChoose, onCan
 
     if (story.audioEnabled === false) {
       setAudioAvailability('unavailable')
-      setVoiceAvailability('unavailable')
+      setRecordedAvailability('unavailable')
       return () => { active = false }
     }
 
     const hasRecording = Boolean(story.audioFiles?.[voiceLanguage])
+    setRecordedAvailability(hasRecording ? 'available' : 'unavailable')
     setAudioAvailability(hasRecording ? 'available' : 'checking')
-    setVoiceAvailability('checking')
     if (typeof window === 'undefined' || !('speechSynthesis' in window) || typeof window.SpeechSynthesisUtterance !== 'function') {
-      setVoiceAvailability('unavailable')
       if (!hasRecording) setAudioAvailability('unavailable')
       return () => { active = false }
     }
@@ -30,12 +29,10 @@ export default function StoryModeDialog({ story, language, text, onChoose, onCan
     waitForLocalVoice(window.speechSynthesis, voiceLanguage)
       .then((voice) => {
         if (!active) return
-        setVoiceAvailability(voice ? 'available' : 'unavailable')
         if (!hasRecording) setAudioAvailability(voice ? 'available' : 'unavailable')
       })
       .catch(() => {
         if (!active) return
-        setVoiceAvailability('unavailable')
         if (!hasRecording) setAudioAvailability('unavailable')
       })
 
@@ -53,7 +50,7 @@ export default function StoryModeDialog({ story, language, text, onChoose, onCan
 
   const options = [
     { mode: 'read', title: text.storyModeRead, help: text.storyModeReadHelp, icon: 'Aa', enabled: true },
-    { mode: 'readAlong', title: text.storyModeReadAlong, help: text.storyModeReadAlongHelp, icon: '✦', enabled: voiceAvailability === 'available', availability: voiceAvailability },
+    { mode: 'readAlong', title: text.storyModeReadAlong, help: text.storyModeReadAlongHelp, icon: '✦', enabled: recordedAvailability === 'available', availability: recordedAvailability },
     { mode: 'listen', title: text.storyModeListen, help: text.storyModeListenHelp, icon: '♫', enabled: audioAvailability === 'available', availability: audioAvailability },
   ]
 
