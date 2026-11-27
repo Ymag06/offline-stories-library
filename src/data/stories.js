@@ -60,5 +60,24 @@ export const stories = [
     art: 'seed',
     featured: false,
   },
+  {
+    id: 'hare-and-tortoise',
+    title: { en: 'The Hare and the Tortoise', my: 'ယုန်နှင့်လိပ်ပုံပြင်' },
+    description: {
+      en: 'A steady tortoise shows a boastful hare that patience can win the race.',
+      my: 'ဇွဲရှိရှိ ဆက်လက်ကြိုးစားခြင်းက အရေးကြီးကြောင်း ယုန်နှင့်လိပ်တို့၏ ပြိုင်ပွဲက သင်ပြပေးသည်။',
+    },
+    category: 'adventure',
+    minutes: 3,
+    icon: '🐢',
+    art: 'adventure',
+    featured: true,
+    coverImage: '/stories/hare-and-tortoise/cover.png',
+    pageImages: Array.from({ length: 5 }, (_, index) => `/stories/hare-and-tortoise/page-${index + 1}.png`),
+    audioFiles: {
+      en: '/stories/hare-and-tortoise/audio-en.mp3',
+      my: '/stories/hare-and-tortoise/audio-my.mp3',
+    },
+  },
 ]
 

@@ -1,41 +1,46 @@
 const navItems = [
-  { id: 'home', icon: '⌂' },
-  { id: 'library', icon: '▤' },
-  { id: 'myStories', icon: '♡' },
-  { id: 'progress', icon: '◷' },
-  { id: 'settings', icon: '⚙' },
+  { id: 'library', label: 'readNav', icon: '▤' },
+  { id: 'myStories', label: 'createNav', icon: '✎' },
+  { id: 'progress', label: 'readingNav', icon: '◷' },
 ]
 
 export default function Header({ text, section, isStoryOpen, onNavigate }) {
   return (
-    <header className="sticky top-0 z-10 border-b border-ink/10 bg-cream/[0.92] backdrop-blur-[16px] dark:border-line">
-      <div className="mx-auto flex min-h-[82px] max-w-[1280px] items-center justify-between gap-7 px-[42px] max-wide:gap-[18px] max-wide:px-6 max-tablet:min-h-[74px] max-tablet:flex-wrap max-tablet:gap-x-3 max-tablet:gap-y-0 max-tablet:px-5 max-tablet:pt-3 max-tablet:pb-2 max-compact:px-[15px] max-compact:pt-[10px] max-compact:pb-[6px]">
-        <button className="mr-auto inline-flex shrink-0 cursor-pointer items-center gap-[11px] border-0 bg-transparent p-0 text-left" type="button" onClick={() => onNavigate('home')} aria-label={text.brand}>
-          <span className="grid size-[43px] place-items-center overflow-hidden rounded-[15px] shadow-[0_5px_14px_rgba(23,63,53,0.13)] max-tablet:size-[39px]" aria-hidden="true"><img className="block size-full" src="/storybook.svg" alt="" /></span>
-          <span className="grid leading-[1.15]"><strong className="font-story text-[16px] tracking-[-0.025em] max-compact:text-[14px]">{text.brand}</strong><small className="mt-1 text-[11px] tracking-[0.045em] text-muted max-compact:text-[10px]">{text.brandSub}</small></span>
+    <header className="sticky top-0 z-10 border-b border-white/20 bg-[#56a4e8] transition-colors duration-700 ease-in-out dark:border-line dark:bg-[#142653]">
+      <div className="mx-auto flex min-h-[78px] max-w-[1240px] items-center justify-between gap-8 px-8 max-wide:gap-5 max-wide:px-6 max-tablet:min-h-0 max-tablet:flex-wrap max-tablet:gap-x-3 max-tablet:gap-y-0 max-tablet:px-5 max-tablet:pt-3 max-tablet:pb-2 max-compact:px-4 max-compact:pt-3 max-compact:pb-2">
+        <button className="mr-auto inline-flex min-h-12 shrink-0 cursor-pointer items-center gap-3 rounded-xl border-0 bg-transparent p-0 text-left" type="button" onClick={() => onNavigate('home')} aria-label={`${text.home}: ${text.brand}`}>
+          <span className="grid size-11 place-items-center overflow-hidden rounded-2xl bg-[#fff0b2] shadow-[0_5px_14px_rgba(45,74,139,0.14)] max-tablet:size-10" aria-hidden="true"><img className="block size-full" src="/storybook.svg" alt="" /></span>
+          <span className="grid leading-[1.15] text-white"><strong className="font-story text-[17px] tracking-[-0.025em] max-compact:text-[15px]">{text.brand}</strong><small className="mt-1 text-xs text-white/80 max-compact:text-[11px]">{text.brandSub}</small></span>
         </button>
 
-        <nav className="flex items-center justify-center gap-1 max-tablet:order-3 max-tablet:w-full max-tablet:justify-start max-tablet:overflow-x-auto max-tablet:pt-2 max-tablet:pb-px [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label={text.navLabel}>
+        <nav className="flex items-center justify-center gap-1 rounded-full bg-[#f1f4fa] p-1 dark:bg-[#252f47] max-tablet:order-3 max-tablet:grid max-tablet:w-full max-tablet:grid-cols-3 max-tablet:rounded-2xl max-tablet:p-1" aria-label={text.navLabel}>
           {navItems.map((item) => {
-            const isActive = section === item.id && !isStoryOpen
+            const isActive = (section === item.id || (item.id === 'library' && section === 'home')) && !isStoryOpen
             const navStateClasses = isActive
-              ? 'bg-[#e7eee6] text-green-dark dark:bg-[#2c3d33] dark:text-green-dark'
-              : 'bg-transparent text-[#67766f] hover:bg-[rgba(29,81,67,0.06)] hover:text-green-dark dark:text-[#bdc9c1] dark:hover:bg-[#2c3d33] dark:hover:text-green-dark'
+              ? 'bg-[#ffdc62] text-[#253b69] shadow-[0_3px_0_#e9a942] dark:bg-[#ffdc62] dark:text-[#253b69]'
+              : 'bg-transparent text-[#405575] hover:bg-white/75 hover:text-[#243d78] dark:text-[#dce6ff] dark:hover:bg-white/15'
 
             return (
               <button
-                className={`inline-flex shrink-0 cursor-pointer items-center gap-[7px] whitespace-nowrap rounded-xl border-0 px-3 py-2.5 text-[13px] font-semibold transition-colors duration-[180ms] max-wide:px-2 max-wide:py-[9px] max-wide:text-xs max-tablet:px-[11px] max-tablet:py-2 ${navStateClasses}`}
+                className={`inline-flex min-h-12 shrink-0 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-full border-0 px-5 py-2.5 text-[14px] font-bold transition-[transform,background,color] duration-150 active:scale-[0.97] focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus max-wide:px-4 max-tablet:rounded-xl max-tablet:px-2 max-tablet:py-2 max-tablet:text-[13px] max-compact:min-h-[54px] max-compact:flex-col max-compact:gap-0.5 max-compact:whitespace-normal max-compact:text-[11px] ${navStateClasses}`}
                 key={item.id}
                 type="button"
                 onClick={() => onNavigate(item.id)}
                 aria-current={isActive ? 'page' : undefined}
               >
-                <span className="inline-grid w-[17px] place-items-center text-[17px] leading-none" aria-hidden="true">{item.icon}</span>
-                <span>{text[item.id]}</span>
+                <span className="inline-grid w-[19px] place-items-center text-[18px] leading-none max-compact:text-[17px]" aria-hidden="true">{item.icon}</span>
+                <span className="max-compact:leading-tight">{text[item.label]}</span>
               </button>
             )
           })}
         </nav>
+        <button
+          className={`grid size-12 shrink-0 cursor-pointer place-items-center rounded-full border border-white/50 bg-white/15 text-xl text-white transition-[transform,background] duration-150 hover:bg-white/25 active:scale-90 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-focus dark:border-white/25 dark:bg-white/10 dark:text-white max-tablet:ml-auto max-tablet:size-11 ${section === 'settings' ? 'bg-[#ffdc62] text-[#253b69]' : ''}`}
+          type="button"
+          onClick={() => onNavigate('settings')}
+          aria-label={text.settings}
+          aria-current={section === 'settings' ? 'page' : undefined}
+        >⚙</button>
       </div>
     </header>
   )

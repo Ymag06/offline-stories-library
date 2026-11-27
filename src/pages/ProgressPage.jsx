@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import EmptyPage from '../components/EmptyPage.jsx'
 import ReadingProgressCard from '../components/ReadingProgressCard.jsx'
+import ScrollReveal from '../components/ScrollReveal.jsx'
 import { stories } from '../data/stories.js'
 import { getAllReadingProgress } from '../lib/readingProgress.js'
 import { getAllUserStories } from '../lib/userStories.js'
@@ -47,15 +48,16 @@ export default function ProgressPage({ text, language, onContinueStory }) {
         <div><span className="inline-flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.12em] text-[#577065] dark:text-[#b7cbbd]">{text.brand}</span><h1 className="mt-[6px] mb-1 font-story text-[clamp(26px,3vw,36px)] font-medium leading-[1.2] tracking-[-0.035em] text-green-dark max-compact:text-[28px]">{text.progressTitle}</h1><p className="m-0 text-[13px] text-muted max-compact:text-xs">{text.progressText}</p></div>
       </div>
       <div className="grid gap-[13px]">
-        {records.map(({ record, story }) => (
-          <ReadingProgressCard
-            key={record.storyId}
+        {records.map(({ record, story }, index) => (
+          <ScrollReveal key={record.storyId} pop delay={Math.min(index * 120, 360)}>
+            <ReadingProgressCard
             story={story}
             record={record}
             language={language}
             text={text}
             onContinue={onContinueStory}
-          />
+            />
+          </ScrollReveal>
         ))}
       </div>
     </section>

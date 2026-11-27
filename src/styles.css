@@ -18,7 +18,7 @@
   --color-selected-ink: var(--selected-ink);
   --color-coral: var(--coral);
   --color-yellow: var(--yellow);
-  --color-focus: #e2a43b;
+  --color-focus: #ef8a4c;
   --font-sans: "Noto Sans Myanmar", "Myanmar Text", "Pyidaungsu", "Nirmala UI", system-ui, sans-serif;
   --font-story: Georgia, "Noto Serif Myanmar", "Myanmar Text", "Pyidaungsu", serif;
   --breakpoint-compact: 35rem;
@@ -31,7 +31,7 @@
     "Noto Sans Myanmar", "Myanmar Text", "Pyidaungsu", "Nirmala UI", system-ui,
     sans-serif;
   color: #1c302b;
-  background: #f6f5ee;
+  background: #f4f7fc;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -40,20 +40,20 @@
   font-weight: 400;
   font-size: 16px;
   line-height: 1.55;
-  --ink: #1c302b;
-  --muted: #718079;
-  --green: #1d5143;
-  --green-dark: #173f35;
-  --cream: #f6f5ee;
-  --card: #fffef9;
-  --soft-surface: #edf1e8;
-  --reader-paper: #fffefb;
-  --reader-ink: #263b31;
-  --line: rgba(28, 48, 43, 0.12);
-  --selected-bg: #1d5143;
+  --ink: #23334d;
+  --muted: #6f7d94;
+  --green: #315fce;
+  --green-dark: #243d78;
+  --cream: #f4f7fc;
+  --card: #ffffff;
+  --soft-surface: #eaf0fc;
+  --reader-paper: #fffefa;
+  --reader-ink: #26344d;
+  --line: rgba(35, 51, 77, 0.13);
+  --selected-bg: #315fce;
   --selected-ink: #fff;
-  --coral: #eb9277;
-  --yellow: #f7d477;
+  --coral: #ef765e;
+  --yellow: #ffc94f;
 }
 
 * {
@@ -63,17 +63,24 @@ body {
   min-width: 320px;
   margin: 0;
 }
-button,
-input {
-  font: inherit;
-}
-button {
-  color: inherit;
+@layer base {
+  button,
+  input {
+    font: inherit;
+  }
+  button {
+    color: inherit;
+  }
 }
 button:focus-visible,
 input:focus-visible {
-  outline: 3px solid #e2a43b;
+  outline: 3px solid #ef8a4c;
   outline-offset: 3px;
+}
+button:active:not(:disabled) {
+  scale: 0.97;
+  filter: brightness(0.97);
+  transition: scale 100ms ease, filter 100ms ease;
 }
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -86,22 +93,61 @@ input:focus-visible {
   }
 }
 
+@keyframes story-shelf-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes scroll-card-pop {
+  0% { opacity: 0; transform: translateY(22px) scale(0.9) rotate(-1deg); }
+  62% { opacity: 1; transform: translateY(-2px) scale(1.015) rotate(0.45deg); }
+  78% { transform: translateY(0) scale(1) rotate(-0.2deg); }
+  90% { transform: translateY(0) scale(1) rotate(0.1deg); }
+  100% { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
+}
+
+@keyframes real-page-turn-forward {
+  0% { transform: rotateY(0); box-shadow: 0 2px 5px rgba(52, 43, 31, 0.08); }
+  35% { box-shadow: -18px 4px 24px rgba(52, 43, 31, 0.24); }
+  100% { transform: rotateY(-180deg); box-shadow: -4px 2px 12px rgba(52, 43, 31, 0.12); }
+}
+
+@keyframes real-page-turn-backward {
+  0% { transform: rotateY(0); box-shadow: 0 2px 5px rgba(52, 43, 31, 0.08); }
+  35% { box-shadow: 18px 4px 24px rgba(52, 43, 31, 0.24); }
+  100% { transform: rotateY(180deg); box-shadow: 4px 2px 12px rgba(52, 43, 31, 0.12); }
+}
+
+@media (max-width: 35rem) {
+  @keyframes real-page-turn-forward {
+    0% { transform: rotateX(0); }
+    35% { box-shadow: 0 18px 24px rgba(52, 43, 31, 0.2); }
+    100% { transform: rotateX(-180deg); }
+  }
+
+  @keyframes real-page-turn-backward {
+    0% { transform: rotateX(0); }
+    35% { box-shadow: 0 -18px 24px rgba(52, 43, 31, 0.2); }
+    100% { transform: rotateX(180deg); }
+  }
+}
+
 
 /* High contrast dark palette. Covers, illustrations, and other decorative artwork retain their colors. */
 :root[data-theme="dark"] {
   color-scheme: dark;
   color: #edf4ef;
-  background: #121916;
-  --ink: #edf4ef;
-  --muted: #b1beb6;
-  --green: #83c49a;
-  --green-dark: #d2e7d7;
-  --cream: #121916;
-  --card: #202b25;
-  --soft-surface: #2a3830;
-  --reader-paper: #18211c;
-  --reader-ink: #e7eee9;
-  --line: rgba(222, 239, 227, 0.16);
-  --selected-bg: #345d43;
-  --selected-ink: #f5fff7;
+  background: #151b2b;
+  --ink: #eff3ff;
+  --muted: #b0bad0;
+  --green: #83a9ff;
+  --green-dark: #dce6ff;
+  --cream: #151b2b;
+  --card: #202941;
+  --soft-surface: #2a3550;
+  --reader-paper: #1c263a;
+  --reader-ink: #edf2ff;
+  --line: rgba(225, 233, 255, 0.16);
+  --selected-bg: #416fda;
+  --selected-ink: #ffffff;
 }

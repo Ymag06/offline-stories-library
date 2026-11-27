@@ -19,3 +19,7 @@ export function getStoryPages(story, language) {
   const pageSet = storyPages[story.id]
   return pageSet?.[language] || pageSet?.en || []
 }
+
+export function getStoryPageImage(story, pageIndex) {
+  return story.pageImages?.[pageIndex] || null
+}
