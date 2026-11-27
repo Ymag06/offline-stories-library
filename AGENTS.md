@@ -11,6 +11,7 @@ The initial app shell is scaffolded and implementation is proceeding in small st
 - The responsive, installable PWA at the same website URL is the mobile version. Play Store distribution is not planned; a separate Android package is optional and undecided.
 - Support English and Burmese, with layouts responsive across phone, tablet, and desktop screen sizes. Default to English and provide an immediate language switch; keep the choice in small local settings.
 - Use clearly identified fictional placeholder stories for the initial implementation. The prototype may include Burmese placeholder copy, but it needs fluent review before distribution. Do not imply that placeholder stories are published or licensed reading material.
+- A story and narration package explicitly supplied by the user may be added as bundled local content. Preserve its source files and verify redistribution rights before public release.
 - Sample reader pages should be bilingual and follow the selected app language.
 - Keep project skills in `.agents/skills/` so they can be shared with collaborators.
 - GitHub origin is `https://github.com/Ymag06/offline-stories-library.git`, with `main` as the collaboration branch. Vercel is the selected production host for the static PWA, but deployment is deferred until the agreed MVP features are complete. Do not change the remote or deployment provider without the user's direction.
@@ -25,15 +26,15 @@ The initial app shell is scaffolded and implementation is proceeding in small st
 - Keep user-written stories in My Stories; do not add them to the main Library unless the user changes this decision.
 - Use bundled/local assets and readable, child-friendly layouts. Keep English and Burmese text support in mind in components and typography; do not rely on an internet font service.
 - Removing one user-written story may remove its own progress, but must not delete unrelated stories or reading progress.
-- When a story opens, offer Read or Listen and recommend Read. Listening must use a locally installed browser speech voice matching the story language; never send story text to a remote TTS service.
-- During Listen, highlight the currently spoken word using browser word-boundary events. Support English and Burmese segmentation, and do not show a misleading approximate word highlight when the browser provides no word boundaries.
-- Show simple Audio available/unavailable status on story cards based on device text-to-speech support for the story language; do not expose technical voice details to readers.
+- When a story opens, offer Read, Read and listen along, or Listen and recommend Read. Use a bundled, locally stored narration for the selected story language when supplied; otherwise use a locally installed browser speech voice matching the story language. Never send story text to a remote TTS service.
+- Read and listen along uses local browser speech and highlights the current word using word-boundary events. Do not show an inaccurate approximation when boundaries are unavailable. Listen mode uses the bundled recording when present.
+- Show simple Audio available/unavailable status on story cards when a bundled narration or matching local text-to-speech voice is available for the selected language; do not expose technical voice details to readers.
 - When audio is unavailable, disable Listen in the story choice and keep Read available. If speech fails after it starts, offer a direct switch to reading.
 - Keep one fictional sample story intentionally unavailable for audio as a prototype state, even when the device supports narration.
-- Include pause/resume, about-five-second skip controls, and a seek bar for speech. Label playback time and seeking as approximate; browser speech synthesis does not expose a reliable, seekable audio timeline.
+- Include pause/resume, about-five-second skip controls, and a seek bar for speech. Label text-to-speech time and seeking as approximate; browser speech synthesis does not expose a reliable, seekable audio timeline. Recorded audio can use its real timeline and save its playback position locally.
 - Save page-level reading progress and resume at the saved page. For user-written stories, choose the voice using the story's language rather than the interface language.
 - Keep the language switch in Settings only. Provide light and dark themes there, save the preference locally, and keep foreground/background text readable in both themes.
-- Reader controls should sit beside the story in a collapsible toolbar and include text sizing, page/scroll layout selection, and page navigation. Continuous-scroll mode should display one connected reading surface while tracking internal page landmarks.
+- Text-size and reading-layout controls should sit beside the story in a collapsible toolbar. In page layout, put previous/next buttons on the left and right edges of the book and the page count below it. In continuous-scroll mode, keep compact page navigation below the connected reading surface while tracking internal page landmarks.
 - Settings should open as a compact side drawer with language and theme choices rather than a full-page settings layout.
 - A separate Android package may be reconsidered later, but it is outside the current MVP. Record options and tradeoffs in `progress.md` before making a project-wide commitment.
 

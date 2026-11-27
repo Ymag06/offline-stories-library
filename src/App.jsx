@@ -63,6 +63,7 @@ export default function App() {
       setPendingStory(null)
       return
     }
+    window.speechSynthesis?.cancel()
     setSection(nextSection)
     setSelectedStory(null)
     setPendingStory(null)
@@ -97,9 +98,9 @@ export default function App() {
           onNavigate={navigate}
         />
 
-        <main className="mx-auto min-h-[calc(100vh-82px)] w-full max-w-[1180px] px-[42px] pt-[38px] pb-[28px] max-wide:px-6 max-tablet:min-h-[calc(100vh-112px)] max-tablet:px-5 max-tablet:py-[26px] max-compact:px-[14px] max-compact:pt-[18px] max-compact:pb-[23px]">
+        <main className={`${contentSection === 'home' && !selectedStory ? 'min-h-[calc(100vh-82px)] w-full bg-[#56a4e8] pb-10 transition-colors duration-700 ease-in-out dark:bg-[#142653]' : 'mx-auto min-h-[calc(100vh-82px)] w-full max-w-[1240px] px-8 pt-8 pb-10 max-wide:px-6 max-tablet:min-h-[calc(100vh-112px)] max-tablet:px-5 max-tablet:py-6 max-compact:px-4 max-compact:pt-5 max-compact:pb-8'}`}>
           {selectedStory ? (
-            <ReaderPage key={selectedStory.id} story={selectedStory} mode={readerMode} language={language} text={text} suspendAudio={section === 'settings'} onBack={() => setSelectedStory(null)} />
+            <ReaderPage key={selectedStory.id} story={selectedStory} mode={readerMode} language={language} text={text} suspendAudio={section === 'settings'} onBack={() => { window.speechSynthesis?.cancel(); setSelectedStory(null) }} />
           ) : contentSection === 'home' ? (
             <HomePage text={text} language={language} onNavigate={navigate} onChooseStory={openStoryChoice} onChooseCategory={chooseCategory} />
           ) : contentSection === 'library' ? (
@@ -110,7 +111,7 @@ export default function App() {
             <ProgressPage text={text} language={language} onContinueStory={openStoryChoice} />
           ) : null}
 
-          <PageFooter text={text} />
+          <PageFooter text={text} onBlue={contentSection === 'home' && !selectedStory} />
         </main>
         {pendingStory && (
           <StoryModeDialog

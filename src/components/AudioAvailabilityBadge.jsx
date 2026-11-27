@@ -13,6 +13,11 @@ export default function AudioAvailabilityBadge({ story, language, text }) {
       return () => { active = false }
     }
 
+    if (story.audioFiles?.[language]) {
+      setAvailable(true)
+      return () => { active = false }
+    }
+
     if (typeof window === 'undefined' || !('speechSynthesis' in window) || typeof window.SpeechSynthesisUtterance !== 'function') {
       setAvailable(false)
       return () => { active = false }
@@ -23,14 +28,14 @@ export default function AudioAvailabilityBadge({ story, language, text }) {
       .catch(() => { if (active) setAvailable(false) })
 
     return () => { active = false }
-  }, [language, story.audioEnabled])
+  }, [language, story.audioEnabled, story.audioFiles])
 
   const state = available === null ? 'checking' : available ? 'available' : 'unavailable'
   const label = available === null ? text.audioChecking : available ? text.audioAvailable : text.audioUnavailable
   const stateClasses = {
-    checking: 'border-[rgba(95,105,99,0.16)] bg-[#f4f4ef] text-[#758078] dark:border-line dark:bg-[#29342e] dark:text-[#c4cec7]',
-    available: 'border-[rgba(69,113,79,0.22)] bg-[#edf4e9] text-[#426b4a] dark:border-[rgba(131,196,154,0.32)] dark:bg-[#253c2c] dark:text-[#c5ebce]',
-    unavailable: 'border-[rgba(180,55,49,0.24)] bg-[#fff0ed] text-[#9e3934] dark:border-[rgba(255,151,145,0.45)] dark:bg-[#492b2b] dark:text-[#ffd0cc]',
+    checking: 'border-line bg-[#f2f5fb] text-[#65738b] dark:border-line dark:bg-[#2b3650] dark:text-[#c4cee2]',
+    available: 'border-[rgba(69,140,91,0.24)] bg-[#eaf6ec] text-[#356c43] dark:border-[rgba(131,196,154,0.32)] dark:bg-[#253c2c] dark:text-[#c5ebce]',
+    unavailable: 'border-[rgba(211,87,71,0.24)] bg-[#fff0ed] text-[#9e3934] dark:border-[rgba(255,151,145,0.45)] dark:bg-[#492b2b] dark:text-[#ffd0cc]',
   }
 
   return (

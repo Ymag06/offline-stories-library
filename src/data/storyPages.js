@@ -1,5 +1,28 @@
-// Fictional bilingual page text for the prototype; Burmese copy needs fluent review.
+import hareTortoiseEnglish from './storySources/hare-and-tortoise-en.txt?raw'
+import hareTortoiseBurmese from './storySources/hare-and-tortoise-my.txt?raw'
+
+function storyParagraphs(source) {
+  return source
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .slice(1)
+}
+
+function createStoryPages(source, pageGroups, removeMarkdown = false) {
+  const paragraphs = storyParagraphs(source)
+    .filter((paragraph) => paragraph !== 'Lesson')
+    .map((paragraph) => removeMarkdown ? paragraph.replace(/^\*\*(.*)\*\*$/, '$1') : paragraph)
+
+  return pageGroups.map((group) => group.map((index) => paragraphs[index]).filter(Boolean).join('\n\n'))
+}
+
+// Supplied story text is kept in source files; the Burmese wording should receive fluent review before publication.
 export const storyPages = {
+  'hare-and-tortoise': {
+    en: createStoryPages(hareTortoiseEnglish, [[0, 1], [2], [3], [4], [5, 6]], true),
+    my: createStoryPages(hareTortoiseBurmese, [[0, 1], [2], [3, 4], [5], [6, 7]]),
+  },
   'moon-garden': {
     en: [
       'One evening, Pip the fox followed a silver moth past the old fence. Beyond it, a garden glimmered softly beneath the moon. The gate had been stuck for years, but the moth slipped through a loose board. Pip listened to the quiet before stepping inside.',

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import StoryCard from '../components/StoryCard.jsx'
+import ScrollReveal from '../components/ScrollReveal.jsx'
 import { categories, stories } from '../data/stories.js'
 
 export default function LibraryPage({ text, language, initialCategory = 'all', onChooseStory }) {
@@ -19,7 +20,7 @@ export default function LibraryPage({ text, language, initialCategory = 'all', o
   return (
     <section className="pt-[11px]">
       <div className="mb-[26px] flex items-start justify-between gap-5 max-compact:flex-col max-compact:gap-3">
-        <div><span className="inline-flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-[0.12em] text-[#577065] dark:text-[#b7cbbd]">{text.sample}</span><h1 className="mt-[6px] mb-1 font-story text-[clamp(26px,3vw,36px)] font-medium leading-[1.2] tracking-[-0.035em] text-green-dark max-compact:text-[28px]">{text.searchTitle}</h1><p className="m-0 text-[13px] text-muted max-compact:text-xs">{text.searchSub}</p></div>
+        <div><span className="inline-flex items-center rounded-full bg-[#e8efff] px-3 py-1 text-xs font-extrabold text-[#315fce] dark:bg-[#2b3b61] dark:text-[#b9ccff]">{text.sample}</span><h1 className="mt-2 mb-1 font-story text-[clamp(30px,3.2vw,40px)] font-bold leading-[1.15] tracking-[-0.035em] text-green-dark max-compact:text-[28px]">{text.searchTitle}</h1><p className="m-0 text-sm text-muted max-compact:text-xs">{text.searchSub}</p></div>
       </div>
       <label className="mb-[18px] flex h-[52px] w-full max-w-[520px] items-center gap-[11px] rounded-[15px] border border-ink/12 bg-card px-[15px] text-[#7b8b82] dark:border-line dark:text-muted">
         <span className="text-[25px] leading-none" aria-hidden="true">⌕</span>
@@ -37,7 +38,7 @@ export default function LibraryPage({ text, language, initialCategory = 'all', o
       <div className="mb-6 flex flex-wrap gap-2" role="group" aria-label={text.allStories}>
         {categories.map((category) => (
           <button
-            className={`cursor-pointer rounded-full border border-ink/12 bg-[rgba(255,254,249,0.55)] px-[13px] py-[9px] text-[11px] font-bold text-[#63736a] hover:border-selected-bg hover:bg-selected-bg hover:text-selected-ink dark:border-line dark:bg-[#202b25] dark:text-[#d3ddd6] ${activeCategory === category.id ? 'border-selected-bg bg-selected-bg text-selected-ink' : ''}`}
+            className={`min-h-11 cursor-pointer rounded-full border border-ink/12 bg-[rgba(255,254,249,0.55)] px-4 py-2.5 text-[13px] font-bold text-[#53685d] transition-colors hover:border-selected-bg hover:bg-selected-bg hover:text-selected-ink dark:border-line dark:bg-[#202b25] dark:text-[#d3ddd6] ${activeCategory === category.id ? 'border-selected-bg bg-selected-bg text-selected-ink' : ''}`}
             key={category.id}
             type="button"
             onClick={() => setActiveCategory(category.id)}
@@ -49,8 +50,10 @@ export default function LibraryPage({ text, language, initialCategory = 'all', o
       </div>
       {visibleStories.length ? (
         <div className="grid grid-cols-3 gap-[17px] max-tablet:grid-cols-2 max-compact:grid-cols-1 max-compact:gap-[13px]">
-          {visibleStories.map((story) => (
-            <StoryCard key={story.id} story={story} language={language} text={text} onChoose={onChooseStory} />
+          {visibleStories.map((story, index) => (
+            <ScrollReveal key={story.id} delay={Math.min(index * 70, 350)}>
+              <StoryCard story={story} language={language} text={text} onChoose={onChooseStory} />
+            </ScrollReveal>
           ))}
         </div>
       ) : (

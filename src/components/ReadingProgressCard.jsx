@@ -5,7 +5,9 @@ import { textButtonClasses } from './buttonClasses.js'
 
 export default function ReadingProgressCard({ story, record, language, text, onContinue }) {
   const totalPages = Math.max(1, record.totalPages || 1)
-  const percent = record.completed
+  const isCompleted = Boolean(record.completed && record.lastPosition >= totalPages - 1)
+  const displayedPage = isCompleted ? totalPages : Math.min(record.lastPosition + 1, totalPages)
+  const percent = isCompleted
     ? 100
     : Math.min(100, Math.round(((record.lastPosition + 1) / totalPages) * 100))
   const lastOpened = new Intl.DateTimeFormat(language === 'my' ? 'my-MM' : 'en-US', { dateStyle: 'medium' })
@@ -17,10 +19,10 @@ export default function ReadingProgressCard({ story, record, language, text, onC
       <div className="min-w-0 self-center">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <span className="text-[10px] font-extrabold uppercase tracking-[0.08em] text-[#59806b] dark:text-[#a3d1ad]">{record.completed ? text.completed : `${percent}% ${text.read}`}</span>
+            <span className="text-[10px] font-extrabold uppercase tracking-[0.08em] text-[#59806b] dark:text-[#a3d1ad]">{isCompleted ? text.completed : `${percent}% ${text.read}`}</span>
             <h2 className="mt-[5px] mb-[10px] font-story text-[19px] font-semibold leading-[1.3] text-green-dark max-compact:text-base">{getStoryTitle(story, language)}</h2>
           </div>
-          <span className="whitespace-nowrap rounded-lg bg-[#f0f2ec] px-2 py-[5px] text-[10px] font-bold text-[#718078] dark:bg-[#2b3831] dark:text-[#d1ddd4]">{record.lastPosition + 1}/{totalPages}</span>
+          <span className="whitespace-nowrap rounded-lg bg-[#f0f2ec] px-2 py-[5px] text-[10px] font-bold text-[#718078] dark:bg-[#2b3831] dark:text-[#d1ddd4]">{displayedPage}/{totalPages}</span>
         </div>
         <div className="h-[5px] overflow-hidden rounded-full bg-[#e8ece3] dark:bg-[#344139]" role="progressbar" aria-label={text.progressTitle} aria-valuemin="0" aria-valuemax="100" aria-valuenow={percent}>
           <span className="block h-full rounded-[inherit] bg-[#75a783] transition-[width] duration-200" style={{ width: `${percent}%` }} />

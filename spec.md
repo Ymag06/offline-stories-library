@@ -87,7 +87,7 @@ Requirements:
 - Users should be able to filter stories by category.
 - Users should be able to open and read stories.
 - The Library should contain built-in stories; user-written stories belong in My Stories.
-- Story cards should show whether audio is available for that story. Audio uses device text-to-speech rather than recorded files; use plain “Audio available/unavailable” labels.
+- Story cards should show whether audio is available for the selected story language. Use a bundled local recording when one is supplied; otherwise use device text-to-speech. Show plain “Audio available/unavailable” labels.
 - If audio is unavailable, disable Listen in the story mode choice and explain that reading remains available.
 
 ### 3.3 Story Reader
@@ -103,15 +103,15 @@ Requirements:
 - Provide basic reading controls.
 - Allow users to navigate between pages.
 - Let readers switch between page-by-page and continuous-scroll layouts.
-- Put page navigation, text-size controls, and the layout switch beside the reading area in a collapsible toolbar.
+- Put text-size controls and the layout switch beside the reading area in a collapsible toolbar. In page layout, place previous/next buttons on the book's left and right edges; keep the page count below the book. In scroll layout, keep compact page navigation controls below the reading surface.
 - In continuous-scroll mode, show the story in one connected reading surface, not separate page cards. Preserve internal page landmarks for progress tracking.
 - Remember the last reading position.
 - Allow users to resume reading.
-- When a story is opened, let the reader choose Read or Listen; recommend Read because offline speech voices depend on the device.
-- Listen with the browser's locally installed speech voice only; do not send story text to a service or require a network connection.
+- When a story is opened, let the reader choose Read, Read and listen along, or Listen; recommend Read because offline speech voices depend on the device.
+- Listen with a bundled local recording when available, or the browser's locally installed speech voice otherwise. Do not send story text to a service or require a network connection.
 - If no installed offline voice matching the story language is available, explain this and offer Read instead.
-- Listening controls must support play/pause and approximate backward/forward seeking with a seek bar and short skip buttons. Clearly label the time and position as approximate because text-to-speech does not provide a consistent audio timeline.
-- While listening, highlight the word currently being spoken using the browser's word-boundary events. Support English and Burmese text segmentation; do not show an inaccurate approximate word highlight when word boundaries are unavailable.
+- Listening controls must support play/pause and backward/forward seeking with a seek bar and short skip buttons. For speech synthesis, clearly label time and position as approximate because it does not provide a consistent audio timeline. For recordings, use the real audio timeline and save the playback position locally.
+- In Read and listen along mode, use local browser speech and highlight the current word using word-boundary events. Do not show an inaccurate approximation when boundaries are unavailable. Listen mode uses the bundled recording when present.
 - Advance through story pages during listening and save page-level reading progress so the user can resume at the saved page.
 - Provide a simple interface suitable for children.
 
@@ -251,6 +251,7 @@ Each story should contain:
 - Story pages or sections
 - Story language
 - Source (built-in or user-written)
+- Optional local audio recordings by language and optional page illustrations
 
 ### Reading Progress Data
 
@@ -260,6 +261,7 @@ Each reading progress record should contain:
 - Last reading position
 - Completion status
 - Last opened date
+- Optional recorded-audio playback position and language
 
 ### Data Persistence
 
